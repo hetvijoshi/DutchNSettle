@@ -1,4 +1,3 @@
-const { Schema } = require("mongoose");
 const { User } = require("../../models");
 
 exports.createUser = (data) => {
@@ -41,7 +40,7 @@ exports.getUserDetailsById = (id) => {
     let result;
     try {
         let matchQuery = {
-            "_id": new Schema.Types.ObjectId(id),
+            "_id": id,
         };
         result = User.findOne(matchQuery).lean();
     } catch (error) {
@@ -53,11 +52,37 @@ exports.getUserDetailsById = (id) => {
 exports.getUserDetailsByIds = (ids) => {
     let result;
     try {
-        let idArray = ids.map(id => { return new Schema.Types.ObjectId(id) });
         let matchQuery = {
-            "_id": { "$in": idArray },
+            "_id": { "$in": ids },
         };
-        result = User.findOne(matchQuery).lean();
+        result = User.find(matchQuery).lean();
+    } catch (error) {
+        return Promise.reject(error);
+    }
+    return result;
+}
+
+exports.getUsersBySearchKeyword = (data) => {
+    let result;
+    try {
+        let matchQuery = {
+            name: { $regex: "^" + data, $options: "i" },
+        };
+        result = User.find(matchQuery).lean();
+    } catch (error) {
+        return Promise.reject(error);
+    }
+    return result;
+}
+
+exports.updateUser = (data) => {
+    let result;
+    try {
+        const { _id } = data;
+        result = User.findByIdAndUpdate(
+            { _id },
+            { $set: data },
+            { new: true });
     } catch (error) {
         return Promise.reject(error);
     }
