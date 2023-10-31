@@ -12,7 +12,9 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.13",
+    "@mui/lab": "^5.0.0-alpha.151",
     "@mui/material": "^5.14.13",
+    "@next/font": "^14.0.0",
     "autofix": "^0.6.0",
     "jsonwebtoken": "^9.0.2",
     "next": "13.5.4",
@@ -20,7 +22,7 @@
     "react": "^18.2.0",
     "react-dom": "^18",
     "react-hooks": "^1.0.1",
-    "sass": "^1.69.3"
+    "sass": "^1.69.5"
   },
   "devDependencies": {
     "eslint": "^8.51.0",

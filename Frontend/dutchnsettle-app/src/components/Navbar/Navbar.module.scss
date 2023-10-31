@@ -1,0 +1,17 @@
+@import './../../styles/colors.scss';
+
+.navbar {
+    background-color: transparent;
+}
+
+.sign_in_button {
+    padding: 5px 20px 5px 20px;
+    background-color: $secondary--darkblue;
+    color: $white;
+    text-transform: none;
+
+    &:hover {
+        color: $secondary--darkblue !important;
+        border: 2px solid $secondary--darkblue;
+    }
+}

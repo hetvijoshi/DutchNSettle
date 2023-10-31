@@ -1,10 +1,12 @@
 import React, { useState } from "react"
-import { Container, Toolbar, Typography, Box, IconButton, Menu, MenuItem, Tooltip, Avatar, Grid } from "@mui/material";
+import { Container, Typography, Box, IconButton, Menu, MenuItem, Tooltip, Avatar, Grid, Button } from "@mui/material";
 import classes from "./Navbar.module.scss";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export const Navbar = () => {
-    const settings = ["Profile", "Account", "Dashboard", "Logout"];
+    const settings = [{ title: "Profile", link: "" }, { title: "Account", link: "" }, { title: "Dashboard", link: "" }, { title: "Logout" }];
     const [anchorElUser, setAnchorElUser] = useState(null);
+    const { data: session } = useSession()
 
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
@@ -17,16 +19,16 @@ export const Navbar = () => {
     return (
         <nav className={classes.navbar}>
             <Container>
-                <Toolbar disableGutters>
-                    <Grid container justifyContent={"space-between"} alignItems={"center"} >
-                        <Grid item>
-                            <img src="/Logo.png" height="80px" width="150px" />
-                        </Grid>
+                <Grid container justifyContent={"space-between"} alignItems={"center"} >
+                    <Grid item>
+                        <img src="/Logo.png" height="80px" width="150px" />
+                    </Grid>
+                    {session?.user ? (
                         <Grid item>
                             <Box sx={{ flexGrow: 1 }}>
                                 <Tooltip title="Open settings">
                                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                        <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                                        <Avatar alt="Remy Sharp" src={session?.user?.image} />
                                     </IconButton>
                                 </Tooltip>
                                 <Menu
@@ -46,18 +48,19 @@ export const Navbar = () => {
                                     onClose={handleCloseUserMenu}
                                 >
                                     {settings.map((setting) => (
-                                        <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                            <Typography textAlign="center">{setting}</Typography>
+                                        <MenuItem key={setting.title} onClick={() => { setting.title == "Logout" ? signOut({ callbackUrl: "http://localhost:3000" }) : handleCloseUserMenu() }}>
+                                            <Typography textAlign="center">{setting.title}</Typography>
                                         </MenuItem>
                                     ))}
                                 </Menu>
 
                             </Box>
                         </Grid>
-                    </Grid>
-                </Toolbar>
+                    ) : <Button className={classes.sign_in_button} onClick={() => signIn("google", { callbackUrl: "http://localhost:3000/dashboard" })}>Sign In</Button>
+                    }
+                </Grid>
             </Container>
-        </nav>
+        </nav >
     )
 }
 
