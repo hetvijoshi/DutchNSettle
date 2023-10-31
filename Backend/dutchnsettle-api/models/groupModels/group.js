@@ -7,12 +7,14 @@ const groupSchema = new Schema({
     groupMembers: {
         type: [
             {
-                userId: { type: Schema.Types.ObjectId, ref: "User", required: true }
+                user: { type: Schema.Types.ObjectId, ref: "User", required: true }
             }
         ],
-        require: true,
-        validate: [(val) => { return val.length >= 2; }, 'Group should have atleast 2 members other than creator.']
+        require: true
     },
+    createdDate: { type: Date, default: Date.now },
+    modifiedDate: { type: Date, default: Date.now },
+    createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true }
 });
 
 module.exports = model("Group", groupSchema);
