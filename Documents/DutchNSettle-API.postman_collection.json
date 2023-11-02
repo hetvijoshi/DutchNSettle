@@ -1,0 +1,253 @@
+{
+	"info": {
+		"_postman_id": "8cd41ce0-eb68-470d-9ca0-8904faf597e5",
+		"name": "DutchNSettle-API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30810942",
+		"_collection_link": "https://cloudy-spaceship-769699.postman.co/workspace/116b6a56-641e-478c-989d-f69965648152/collection/30810942-8cd41ce0-eb68-470d-9ca0-8904faf597e5?action=share&source=collection_link&creator=30810942"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "fetchUserByEmail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}user?email=jgadara85@gmail.com",
+							"host": [
+								"{{baseUrl}}user"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "jgadara85@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "newUser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"jgadara85@gmail.com\",\r\n  \"firstName\": \"Jainik\",\r\n  \"lastName\": \"Gadara\",\r\n  \"picture\": \"https://lh3.googleusercontent.com/a/ACg8ocLB52u0gjU6ApBva9HtjP9TpVHwrOB3aeC5hzUau-VB=s96-c\",\r\n  \"Phone\": 6824067989,\r\n  \"name\":\"Jainik Gadara\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}user/",
+							"host": [
+								"{{baseUrl}}user"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateUser",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_id\": \"654089c9c657466e03c10d1d\",\r\n    \"email\": \"jgadara85@gmail.com\",\r\n    \"firstName\": \"Jainik\",\r\n    \"lastName\": \"Gadara\",\r\n    \"name\": \"Jainik Gadara\",\r\n    \"picture\": \"https://lh3.googleusercontent.com/a/ACg8ocLB52u0gjU6ApBva9HtjP9TpVHwrOB3aeC5hzUau-VB=s96-c\",\r\n    \"Phone\": 9988776655\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}user/",
+							"host": [
+								"{{baseUrl}}user"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "searchUsers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}user/search?s=j",
+							"host": [
+								"{{baseUrl}}user"
+							],
+							"path": [
+								"search"
+							],
+							"query": [
+								{
+									"key": "s",
+									"value": "j"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "fetchUserById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}user/654089c9c657466e03c10d1d",
+							"host": [
+								"{{baseUrl}}user"
+							],
+							"path": [
+								"654089c9c657466e03c10d1d"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Friends",
+			"item": [
+				{
+					"name": "addFriend",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"friendEmail\":\"dutchnsettle@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}friends/",
+							"host": [
+								"{{baseUrl}}friends"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getFriends",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}friends?id=653c1a69725236972314e59f",
+							"host": [
+								"{{baseUrl}}friends"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "653c1a69725236972314e59f"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Group",
+			"item": [
+				{
+					"name": "createGroup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"groupName\": \"Tripod\",\r\n    \"groupIcon\": \"\",\r\n    \"groupMembers\": [\r\n        {\r\n            \"user\": \"654089c9c657466e03c10d1d\"\r\n        }\r\n    ],\r\n    \"createdBy\":\"654089c9c657466e03c10d1d\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}group/",
+							"host": [
+								"{{baseUrl}}group"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "fetchGroup",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}group/65412d2bc892f7dd5e0b5fc5",
+							"host": [
+								"{{baseUrl}}group"
+							],
+							"path": [
+								"65412d2bc892f7dd5e0b5fc5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addMember",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"groupId\":\"65412d2bc892f7dd5e0b5fc5\",\r\n    \"userId\":\"653de6a4134390feca2dbcc7\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}group/member",
+							"host": [
+								"{{baseUrl}}group"
+							],
+							"path": [
+								"member"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
