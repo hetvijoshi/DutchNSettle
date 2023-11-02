@@ -1,4 +1,4 @@
-const { getFriendsListByUserId } = require("../../services/user/friendsService");
+const { getFriendsListByUserId, addFriend } = require("../../services/user/friendsService");
 const { getUserDetailsByEmails } = require("../../services/user/userService");
 
 class FriendsController {
@@ -6,22 +6,26 @@ class FriendsController {
         try {
             const payload = req.body;
             let usersExist = await getUserDetailsByEmails([req.user.email, payload.friendEmail]);
-            if (!usersExist && usersExist.length > 1) {
-                let friendRecord = await getFriendsListByUserId(usersExist[1]._id);
+            if (usersExist && usersExist.length == 2) {
+                let friendRecord = await getFriendsListByUserId(usersExist[1]._id.valueOf());
                 if (friendRecord) {
-                    friendRecord.friends = [...friendRecord.friends, { userId: usersExist[0]._id }];
+                    friendRecord.friends = [...friendRecord.friends, { userId: usersExist[0]._id.valueOf() }];
                 } else {
-                    friendRecord.userId = usersExist[1]._id;
-                    friendRecord.friends = [{ userId: usersExist[0]._id }];
+                    friendRecord = {};
+                    friendRecord.userId = usersExist[1]._id.valueOf();
+                    friendRecord.friends = [{ userId: usersExist[0]._id.valueOf() }];
+                    friendRecord = await addFriend(friendRecord);
                 }
                 friendRecord.save();
 
-                friendRecord = await getFriendsListByUserId(usersExist[0]._id);
+                friendRecord = await getFriendsListByUserId(usersExist[0]._id.valueOf());
                 if (friendRecord) {
-                    friendRecord.friends = [...friendRecord.friends, { userId: usersExist[1]._id }];
+                    friendRecord.friends = [...friendRecord.friends, { userId: usersExist[1]._id.valueOf() }];
                 } else {
-                    friendRecord.userId = usersExist[0]._id;
-                    friendRecord.friends = [{ userId: usersExist[1]._id }];
+                    friendRecord = {};
+                    friendRecord.userId = usersExist[0]._id.valueOf();
+                    friendRecord.friends = [{ userId: usersExist[1]._id.valueOf() }];
+                    friendRecord = await addFriend(friendRecord);
                 }
                 friendRecord.save();
 
@@ -34,7 +38,7 @@ class FriendsController {
             } else {
                 return res.status(200).json({
                     type: "fail",
-                    message: `${payload.friendEmail} does not exist.`,
+                    message: `${req.user.email} or ${payload.friendEmail} does not exist.`,
                     data: null,
                 });
             }
