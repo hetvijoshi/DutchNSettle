@@ -1,26 +1,26 @@
-const { sendEmail } = require("../../services/email/emailService");
-const { createUser, getUserDetailsByEmail } = require("../../services/user/userService");
+const { createGroup, getGroup, addMember } = require("../../services/group/groupService");
+
 
 class GroupController {
     static async createGroup(req, res) {
         try {
             const payload = req.body;
-            let user = await getUserDetailsByEmail(payload.email);
-            if (!user) {
-                user = await createUser(payload);
-                user.save();
-                const emailData = {
-                    body: 'Your Account has been created.',
-                    isBodyHtml: true,
-                    toEmail: user.email
-                }
-                await sendEmail(emailData);
+            let group = await createGroup(payload);
+            group.save();
+            if (group) {
+                return res.status(200).json({
+                    type: "success",
+                    message: "Success result",
+                    data: group,
+                });
+            } else {
+                return res.status(200).json({
+                    type: "success",
+                    message: "Success result",
+                    data: null,
+                });
             }
-            return res.status(200).json({
-                type: "success",
-                message: "Success result",
-                data: user,
-            });
+
         } catch (error) {
             return res.status(500).json({
                 type: "error",
@@ -30,24 +30,60 @@ class GroupController {
         }
     }
 
-    static async getUser(req, res) {
+    static async addMember(req, res) {
         try {
-            const email = req.query.email;
-            let user = await getUserDetailsByEmail(email);
-            if (user) {
-                return res.status(200).json({
-                    type: "success",
-                    message: "Success result",
-                    data: user,
-                });
+            const { groupId, userId } = req.body;
+            let group = await addMember(groupId);
+            if (group) {
+                if (group.groupMembers.findIndex(x => x.user == userId) >= 0) {
+                    return res.status(200).json({
+                        type: "fail",
+                        message: "Member already exist in the group.",
+                        data: group,
+                    });
+                } else {
+                    group.groupMembers = [...group.groupMembers, { user: userId }];
+                    group.save();
+                    return res.status(200).json({
+                        type: "success",
+                        message: "Success result",
+                        data: group,
+                    });
+                }
+
             } else {
                 return res.status(200).json({
-                    type: "fail",
-                    message: "User not found",
+                    type: "success",
+                    message: "No group found",
                     data: null,
                 });
             }
+        } catch (error) {
+            return res.status(500).json({
+                type: "error",
+                message: error.message || "Unhandled Error",
+                error,
+            });
+        }
+    }
 
+    static async fetchGroup(req, res) {
+        try {
+            const payload = req.params.id;
+            let group = await getGroup(payload);
+            if (group) {
+                return res.status(200).json({
+                    type: "success",
+                    message: "Success result",
+                    data: group,
+                });
+            } else {
+                return res.status(200).json({
+                    type: "success",
+                    message: "No group found",
+                    data: null,
+                });
+            }
         } catch (error) {
             return res.status(500).json({
                 type: "error",
