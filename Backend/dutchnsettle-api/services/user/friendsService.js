@@ -16,7 +16,10 @@ exports.getFriendsListByUserId = (userId) => {
         let matchQuery = {
             userId: userId,
         };
-        result = Friends.findOne(matchQuery).lean();
+        result = Friends.findOne(matchQuery)
+            .populate('userId')
+            .populate('friends.userId')
+            .lean();
     } catch (error) {
         return Promise.reject(error);
     }

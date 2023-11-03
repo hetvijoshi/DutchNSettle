@@ -1,5 +1,5 @@
 const { sendEmail } = require("../../services/email/emailService");
-const { createUser, getUserDetailsByEmail, getUserDetailsByEmails, getUserDetailsById, getUserDetailsByIds } = require("../../services/user/userService");
+const { createUser, getUserDetailsByEmail, getUserDetailsByEmails, getUserDetailsById, getUserDetailsByIds, updateUser, getUsersBySearchKeyword } = require("../../services/user/userService");
 
 class UserController {
     static async newUser(req, res) {
@@ -60,7 +60,7 @@ class UserController {
 
     static async fetchUserById(req, res) {
         try {
-            const id = req.query.id;
+            const id = req.params.id;
             let user = await getUserDetailsById(id);
             if (user) {
                 return res.status(200).json({
@@ -76,6 +76,52 @@ class UserController {
                 });
             }
 
+        } catch (error) {
+            return res.status(500).json({
+                type: "error",
+                message: error.message || "Unhandled Error",
+                error,
+            });
+        }
+    }
+
+    static async searchUsers(req, res) {
+        try {
+            const searchQuery = req.query.s;
+            let user = await getUsersBySearchKeyword(searchQuery);
+            if (user) {
+                return res.status(200).json({
+                    type: "success",
+                    message: "Success result",
+                    data: user,
+                });
+            } else {
+                return res.status(200).json({
+                    type: "fail",
+                    message: "User not found",
+                    data: null,
+                });
+            }
+
+        } catch (error) {
+            return res.status(500).json({
+                type: "error",
+                message: error.message || "Unhandled Error",
+                error,
+            });
+        }
+    }
+
+    static async updateUserDetails(req, res) {
+        try {
+            const payload = req.body;
+            const user = await updateUser(payload);
+            user.save();
+            return res.status(200).json({
+                type: "success",
+                message: "User updated successfully",
+                data: user,
+            });
         } catch (error) {
             return res.status(500).json({
                 type: "error",
