@@ -16,6 +16,7 @@
     "@mui/material": "^5.14.13",
     "@next/font": "^14.0.0",
     "autofix": "^0.6.0",
+    "axios": "^1.6.0",
     "jsonwebtoken": "^9.0.2",
     "next": "13.5.4",
     "next-auth": "^4.24.3",

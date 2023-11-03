@@ -1,6 +1,9 @@
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import jwt from "jsonwebtoken"
+import { createUser } from "@/app/services/AuthService"
+
+
 
 // const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env
 const GOOGLE_CLIENT_ID = "887708871770-p3mli4kh7btf56ri42nnbveefcchqtpv.apps.googleusercontent.com"
@@ -13,6 +16,23 @@ const authOptions = NextAuth({
         })
     ],
     callbacks: {
+        async signIn({ user, profile, account }) {
+            if (user && account) {
+                const userData = {}
+                userData["name"] = profile?.name
+                userData["email"] = profile?.email
+                userData["picture"] = profile?.picture
+                userData["firstName"] = profile?.given_name
+                userData["lastName"] = profile?.family_name
+                console.log(userData)
+                const res = await createUser(userData, account.id_token);
+                console.log(res.data.type == "success")
+                return res.data.type == "success" ? true : false;
+            }
+            else{
+                return false
+            }
+        },
         async jwt({ token, account }) {
             // Persist the OAuth access_token to the token right after signin
 
@@ -32,9 +52,10 @@ const authOptions = NextAuth({
             session["access_token"] = token.access_token;
             session.user["firstName"] = token.firstName;
             session.user["lastName"] = token.lastName;
+            console.log("---",session)
             return session;
         },
-    }
+    },
 })
 
 export { authOptions as GET, authOptions as POST };

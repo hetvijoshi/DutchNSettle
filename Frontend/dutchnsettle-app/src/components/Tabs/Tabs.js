@@ -5,6 +5,7 @@ import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
+import CustomTabPanel from "../CustomTabPanel/CustomTabPanel";
 
 export default function Tabs({ tabList }) {
     const [value, setValue] = React.useState("1");
@@ -22,12 +23,14 @@ export default function Tabs({ tabList }) {
                     >
                         {tabList.map((tab, index) => (
 
-                            <Tab key={tab} label={tab} value={index + 1} />
+                            <Tab key={tab} label={tab} value={(index + 1).toString()} />
                         ))}
                     </TabList>
                 </Box>
                 {tabList.map((tab, index) => (
-                    <TabPanel key={tab} value={index + 1}></TabPanel>
+                    <TabPanel key={tab} value={(index + 1).toString()}>
+                        <CustomTabPanel tab={tab} />
+                    </TabPanel>
                 ))}
             </TabContext>
         </Box>

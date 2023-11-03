@@ -7,6 +7,7 @@ export const Navbar = () => {
     const settings = [{ title: "Profile", link: "" }, { title: "Account", link: "" }, { title: "Dashboard", link: "" }, { title: "Logout" }];
     const [anchorElUser, setAnchorElUser] = useState(null);
     const { data: session } = useSession()
+    console.log(session)
 
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
@@ -28,7 +29,7 @@ export const Navbar = () => {
                             <Box sx={{ flexGrow: 1 }}>
                                 <Tooltip title="Open settings">
                                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                        <Avatar alt="Remy Sharp" src={session?.user?.image} />
+                                        <Avatar src={session?.user?.image} />
                                     </IconButton>
                                 </Tooltip>
                                 <Menu

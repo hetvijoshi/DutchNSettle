@@ -4,7 +4,7 @@ import "./globals.css";
 import React from "react";
 import classes from "./layout.module.scss";
 import { Navbar } from "../components/Navbar/Navbar";
-import Providers from "./utility/Providers";
+import Providers from "./lib/utility/Providers";
 import { Poppins } from "@next/font/google";
 
 const poppins = Poppins({
