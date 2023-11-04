@@ -1,14 +1,12 @@
+"use client";
 import * as React from "react";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
-// import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { Box, Button, DialogActions, Typography } from "@mui/material";
 
-export default function CustomDialog({ open, handleClose }) {
-
-
+export default function AddFriendDialog({ open, handleClose }) {
     return (
         <React.Fragment>
             <Dialog open={open} onClose={handleClose} maxWidth={"sm"} sx={{ minWidth: "1000px" }} fullWidth>
@@ -27,6 +25,7 @@ export default function CustomDialog({ open, handleClose }) {
                     </Box>
                 </DialogContent>
                 <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
                     <Button onClick={handleClose}>Submit</Button>
                 </DialogActions>
             </Dialog>

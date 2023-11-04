@@ -1,8 +1,6 @@
 import { CustomCard } from "@/components/CustomCard/CustomCard"
 import React from "react"
 import classes from "./FriendsTab.module.scss"
-import { Button } from "@mui/material"
-import CustomDialog from "@/components/CustomDialog/CustomDialog"
 
 const FriendsTab = () => {
     const friends = [
@@ -31,15 +29,6 @@ const FriendsTab = () => {
             balance: 90,
         },
     ]
-    const [open, setOpen] = React.useState(false);
-
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
     return (
         <>
             <div className={classes.card_wrapper}>
@@ -47,10 +36,6 @@ const FriendsTab = () => {
                     <CustomCard key={friend.name} friendDetail={friend} />
                 ))}
             </div>
-            <div className={classes.button_wrapper}>
-                <Button className={classes.add_friends_button} onClick={handleClickOpen}>Add Friends</Button>
-            </div>
-            <CustomDialog open={open} handleClose={handleClose}/>
         </>
 
     )

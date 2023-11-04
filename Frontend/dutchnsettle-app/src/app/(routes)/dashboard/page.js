@@ -1,3 +1,4 @@
+"use client";
 import { Box, Button, Container, Divider, Grid, Paper, Typography } from "@mui/material"
 import React from "react"
 import classes from "./dashboard.module.scss"
