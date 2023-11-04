@@ -116,6 +116,7 @@ class UserController {
         try {
             const payload = req.body;
             const user = await updateUser(payload);
+            user.modifiedDate = Date.now();
             user.save();
             return res.status(200).json({
                 type: "success",

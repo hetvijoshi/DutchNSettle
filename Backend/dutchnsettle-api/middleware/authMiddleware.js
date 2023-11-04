@@ -1,4 +1,4 @@
-const config = require('../config/appconfig');
+const { appConfig } = require('../config/appconfig');
 const { getUserDetailsByEmail } = require('../services/user/userService');
 
 const isAuthenticated = async (req, res, next) => {
@@ -8,9 +8,10 @@ const isAuthenticated = async (req, res, next) => {
     if (token == null) return res.sendStatus(401);
 
     try {
+
         var responseToken = await req.app.authClient.verifyIdToken({
             idToken: token,
-            audience: config.auth.google.clientID,  // Specify the expected audience of the token
+            audience: appConfig.auth.google.clientID,  // Specify the expected audience of the token
         });
 
         const payload = responseToken.getPayload();

@@ -10,16 +10,28 @@ exports.addFriend = (data) => {
     return result;
 }
 
-exports.getFriendsListByUserId = (userId) => {
+exports.getFriendsListByUserId = async (userId) => {
     let result;
     try {
         let matchQuery = {
-            userId: userId,
+            user: userId,
         };
-        result = Friends.findOne(matchQuery)
-            .populate('userId')
-            .populate('friends.userId')
-            .lean();
+        result = await Friends.findOne(matchQuery)
+            .populate("user")
+            .populate("friends.user");
+    } catch (error) {
+        return Promise.reject(error);
+    }
+    return result;
+}
+
+exports.getFriendsListByUserIds = async (ids) => {
+    let result;
+    try {
+        let matchQuery = {
+            user: { "$in": ids },
+        };
+        result = await Friends.find(matchQuery);
     } catch (error) {
         return Promise.reject(error);
     }

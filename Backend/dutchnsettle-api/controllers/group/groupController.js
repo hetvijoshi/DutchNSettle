@@ -1,4 +1,4 @@
-const { createGroup, getGroup, addMember } = require("../../services/group/groupService");
+const { createGroup, getGroup, addMember, getGroupsForUser } = require("../../services/group/groupService");
 
 
 class GroupController {
@@ -43,7 +43,9 @@ class GroupController {
                     });
                 } else {
                     group.groupMembers = [...group.groupMembers, { user: userId }];
+                    group.modifiedDate = Date.now();
                     group.save();
+                    group.populate('groupMembers.user');
                     return res.status(200).json({
                         type: "success",
                         message: "Success result",
@@ -71,6 +73,32 @@ class GroupController {
         try {
             const payload = req.params.id;
             let group = await getGroup(payload);
+            if (group) {
+                return res.status(200).json({
+                    type: "success",
+                    message: "Success result",
+                    data: group,
+                });
+            } else {
+                return res.status(200).json({
+                    type: "success",
+                    message: "No group found",
+                    data: null,
+                });
+            }
+        } catch (error) {
+            return res.status(500).json({
+                type: "error",
+                message: error.message || "Unhandled Error",
+                error,
+            });
+        }
+    }
+
+    static async fetchGroupsForUser(req, res) {
+        try {
+            const payload = req.params.id;
+            let group = await getGroupsForUser(payload);
             if (group) {
                 return res.status(200).json({
                     type: "success",

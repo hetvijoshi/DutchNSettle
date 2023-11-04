@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const { Group } = require("../../models");
 
 exports.createGroup = (data) => {
@@ -24,6 +25,19 @@ exports.getGroup = (data) => {
     let result;
     try {
         result = Group.findById(data).populate("groupMembers.user").lean();
+    } catch (error) {
+        return Promise.reject(error);
+    }
+    return result;
+}
+
+exports.getGroupsForUser = (id) => {
+    let result;
+    try {
+        let matchQuery = {
+            "groupMembers.user": { "$eq": id }
+        };
+        result = Group.find(matchQuery).populate("groupMembers.user").lean();
     } catch (error) {
         return Promise.reject(error);
     }
