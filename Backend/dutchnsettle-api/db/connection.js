@@ -1,5 +1,5 @@
-const config = require('../config/appconfig');
 const mongoose = require("mongoose");
+const { appConfig } = require("../config/appconfig");
 var debug = require('debug')('dutchnsettle-api:server');
 
 

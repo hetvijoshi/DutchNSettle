@@ -43,7 +43,9 @@ class GroupController {
                     });
                 } else {
                     group.groupMembers = [...group.groupMembers, { user: userId }];
+                    group.modifiedDate = Date.now();
                     group.save();
+                    group.populate('groupMembers.user');
                     return res.status(200).json({
                         type: "success",
                         message: "Success result",
