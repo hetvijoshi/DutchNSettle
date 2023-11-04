@@ -1,0 +1,36 @@
+@import './../../../styles/colors.scss';
+
+.center_paper {
+    height: 100vh;
+    padding-top: 2%;
+    margin-top: 2%;
+    padding-left: 10px;
+    padding-right: 10px;
+    background: rgba(57, 57, 57, 0.1);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 10px #00000059;
+}
+
+.add_expense_button {
+    background-color: $secondary--darkblue;
+    color: $white;
+    text-transform: none;
+    border: 2px solid $secondary--darkblue ;
+    &:hover {
+        color: $secondary--darkblue !important;
+        border: 2px solid $secondary--darkblue ;
+    }
+}
+
+.settle_up_button {
+    margin-left: 20px;
+    background-color: $secondary--blue;
+    color: $white;
+    text-transform: none;
+    border: 2px solid $secondary--blue ;
+
+    &:hover {
+        color: $secondary--blue !important;
+        border: 2px solid $secondary--blue ;
+    }
+}

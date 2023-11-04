@@ -1,0 +1,5 @@
+body {
+    background-image: url('./../../public/home_page_3.jpeg');
+    background-attachment: fixed;
+    background-size: contain;
+}

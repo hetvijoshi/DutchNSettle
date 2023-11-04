@@ -1,27 +1,19 @@
 "use client";
-import { Button, Grid } from "@mui/material";
+import { CssBaseline, Grid, Typography } from "@mui/material";
 import React from "react";
-import { signIn, signOut, useSession } from "next-auth/react"
+import classes from "./page.module.scss";
+
 
 export default function Home() {
-  const { data: session } = useSession()
-  console.log(session)
-  if (session && session.user) {
-    return (
-      <>
-        <p>{session.user.name}</p>
-        <Button onClick={() => signOut()}>Sign Out</Button>
-      </>
-    )
-  }
   return (
     <>
+      <CssBaseline />
       <Grid container
-        direction="row"
+        direction={"column"}
         justifyContent="center"
-        alignItems="center" >
-        Dashboard
-        <Button onClick={() => signIn()}>Sign in with Google</Button>
+        alignItems="center" sx={{ position: "absolute", top: "30%" }}>
+        <img src={"/home_page.jpeg"} alt={"home img"} height={300} width={300} className={classes.home_image} />
+        <Typography variant='h5' sx={{ color: "#23395B", marginTop: "20px", fontFamily: "FreeMono, monospace", fontWeight:"700" }}>SPLIT THE BILL, NOT THE FRIENDSHIP</Typography>
       </Grid>
     </>
   )
