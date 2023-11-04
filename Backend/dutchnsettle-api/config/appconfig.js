@@ -1,9 +1,9 @@
 require('dotenv').config();
 
-module.exports = {
+exports.appConfig = {
     projectId: process.env.GOOGLE_PROJECTID,
     app: {
-        port: process.env.DEV_APP_PORT || 3000,
+        port: process.env.DEV_APP_PORT || 3001,
         appName: process.env.APP_NAME || '',
         env: process.env.NODE_ENV || 'development',
     },
@@ -20,7 +20,7 @@ module.exports = {
             clientSecret: process.env.GOOGLE_CLIENTSECRET || ''
         }
     },
-    pubsub:{
+    pubsub: {
         topicId: process.env.GOOGLE_PUBSUB_TOPICID
     }
 };

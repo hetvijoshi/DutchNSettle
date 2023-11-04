@@ -1,9 +1,7 @@
-const config = require('../config/appconfig');
 const mongoose = require("mongoose");
+const { appConfig } = require("../config/appconfig");
 var debug = require('debug')('dutchnsettle-api:server');
 
-const { env } = config.app
-const { url, db, port, mongoUser, mongoPassword } = config.db
 
 const mongoString = process.env.DB_URL;
 

@@ -1,4 +1,5 @@
-const { getFriendsListByUserId, addFriend } = require("../../services/user/friendsService");
+const { Friends } = require("../../models");
+const { getFriendsListByUserId, getFriendsListByUserIds, addFriend } = require("../../services/user/friendsService");
 const { getUserDetailsByEmails } = require("../../services/user/userService");
 
 class FriendsController {
@@ -7,32 +8,67 @@ class FriendsController {
             const payload = req.body;
             let usersExist = await getUserDetailsByEmails([req.user.email, payload.friendEmail]);
             if (usersExist && usersExist.length == 2) {
-                let friendRecord = await getFriendsListByUserId(usersExist[1]._id.valueOf());
-                if (friendRecord) {
-                    friendRecord.friends = [...friendRecord.friends, { userId: usersExist[0]._id.valueOf() }];
-                } else {
-                    friendRecord = {};
-                    friendRecord.userId = usersExist[1]._id.valueOf();
-                    friendRecord.friends = [{ userId: usersExist[0]._id.valueOf() }];
-                    friendRecord = await addFriend(friendRecord);
-                }
-                friendRecord.save();
+                let friendRecords = await getFriendsListByUserIds([usersExist[0]._id.valueOf(), usersExist[1]._id.valueOf()]);
+                let friend = friendRecords.find(f => f.user.valueOf() == usersExist[0]._id.valueOf());
+                if (friend) {
+                    if (friend.friends.length > 0) {
+                        if (friend.friends.find(f => f.user.valueOf() == usersExist[1]._id.valueOf()) == undefined) {
+                            friend.friends = [...friend.friends, { user: usersExist[1]._id }];
+                            friend.save();
 
-                friendRecord = await getFriendsListByUserId(usersExist[0]._id.valueOf());
-                if (friendRecord) {
-                    friendRecord.friends = [...friendRecord.friends, { userId: usersExist[1]._id.valueOf() }];
-                } else {
-                    friendRecord = {};
-                    friendRecord.userId = usersExist[0]._id.valueOf();
-                    friendRecord.friends = [{ userId: usersExist[1]._id.valueOf() }];
-                    friendRecord = await addFriend(friendRecord);
-                }
-                friendRecord.save();
+                        } else {
+                            return res.status(200).json({
+                                type: "fail",
+                                message: "Friend already exist.",
+                                data: null,
+                            });
+                        }
 
+                    } else {
+                        friend = new Friends();
+                        friend.user = usersExist[0]._id;
+                        friend.friends = [{ user: usersExist[1]._id }];
+                        friend.save();
+                    }
+
+                } else {
+                    friend = new Friends();
+                    friend.user = usersExist[0]._id;
+                    friend.friends = [{ user: usersExist[1]._id }];
+                    friend.save();
+                }
+
+                friend = friendRecords.find(f => f.user.valueOf() == usersExist[1]._id.valueOf());
+                if (friend) {
+                    if (friend.friends.length > 0) {
+                        if (friend.friends.find(f => f.user.valueOf() == usersExist[0]._id.valueOf()) == undefined) {
+                            friend.friends = [...friend.friends, { user: usersExist[0]._id }];
+                            friend.save();
+                        } else {
+                            return res.status(200).json({
+                                type: "fail",
+                                message: "Friend already exist.",
+                                data: null,
+                            });
+                        }
+                    } else {
+                        friend = new Friends();
+                        friend.user = usersExist[1]._id;
+                        friend.friends = [{ user: usersExist[0]._id }];
+                        friend.save();
+                    }
+                } else {
+                    friend = new Friends();
+                    friend.user = usersExist[1]._id;
+                    friend.friends = [{ user: usersExist[0]._id }];
+                    friend.save();
+                }
+
+                let responseData = await getFriendsListByUserId(usersExist.find(u => u.email == req.user.email)?._id);
                 return res.status(200).json({
                     type: "success",
                     message: "Friends added.",
-                    data: friendRecord,
+                    data: responseData,
                 });
 
             } else {

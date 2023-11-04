@@ -66,7 +66,7 @@ exports.getUsersBySearchKeyword = (data) => {
     let result;
     try {
         let matchQuery = {
-            name: { $regex: "^" + data, $options: "i" },
+            $or: [{ name: { $regex: "^" + data, $options: "i" } }, { email: data }]
         };
         result = User.find(matchQuery).lean();
     } catch (error) {
