@@ -1,4 +1,3 @@
-const { ObjectId } = require("mongodb");
 const { Group } = require("../../models");
 
 exports.createGroup = (data) => {

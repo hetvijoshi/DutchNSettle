@@ -1,0 +1,8 @@
+var express = require('express');
+const isAuthenticated = require('../../middleware/authMiddleware');
+const ExpenseController = require('../../controllers/expense/expenseController');
+var router = express.Router();
+
+router.post('/', isAuthenticated, ExpenseController.addExpense);
+
+module.exports = router;
