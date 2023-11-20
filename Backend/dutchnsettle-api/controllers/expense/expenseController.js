@@ -88,25 +88,32 @@ class ExpenseController {
                         let expenseDetails = await addExpenseDetails(expenseDetailPayload);
                         if (expenseDetails) {
                             let paidByUser = await getFriendsListByUserId(paidBy);
-                            let paidByGroupUser = groupDetail.groupMembers.find(member => member.user.toString() == paidBy);
-                            expenseDetailPayload.map(async (share) => {
+                            let paidByGroupUser = groupDetail.groupMembers.find(member => member.user._id.toString() == paidBy);
+                            for (let i = 0; i < expenseDetailPayload.length; i++) {
+                                const share = expenseDetailPayload[i];
+
+                                //Skip payer's own expense record.
+                                if(share.paidFor == paidBy){
+                                    continue;
+                                }
+
                                 let friend1 = paidByUser.friends.find(f => f.user._id.toString() == share.paidFor);
                                 friend1.amount = friend1.amount + share.amount;
 
                                 paidByGroupUser.amount = paidByGroupUser.amount + share.amount;
-                                groupDetail.save();
+                                
 
                                 let paidForUser = await getFriendsListByUserId(share.paidFor);
                                 let friend2 = paidForUser.friends.find(f => f.user._id.toString() == paidBy);
                                 friend2.amount = friend2.amount - share.amount;
 
-                                let paidForGroupUser = groupDetail.groupMembers.find(member => member.user.toString() == paidFor);
-                                paidByGroupUser.amount = paidForGroupUser.amount - share.amount;
-                                groupDetail.save();
-
-                                paidByUser.save();
+                                let paidForGroupUser = groupDetail.groupMembers.find(member => member.user._id.toString() == share.paidFor);
+                                paidForGroupUser.amount = paidForGroupUser.amount - share.amount;
+                                
                                 paidForUser.save();
-                            });
+                            }
+                            paidByUser.save();
+                            groupDetail.save();
                         }
                         return res.status(200).json({
                             type: "success",
