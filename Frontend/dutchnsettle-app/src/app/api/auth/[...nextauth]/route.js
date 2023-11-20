@@ -1,7 +1,7 @@
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import jwt from "jsonwebtoken"
-import { createUser } from "@/app/services/AuthService"
+import { createUser, fetchUser } from "@/app/services/AuthService"
 
 
 
@@ -24,9 +24,8 @@ const authOptions = NextAuth({
                 userData["picture"] = profile?.picture
                 userData["firstName"] = profile?.given_name
                 userData["lastName"] = profile?.family_name
-                console.log(userData)
                 const res = await createUser(userData, account.id_token);
-                console.log(res.data.type == "success")
+                user["userId"] = res.data.data._id
                 return res.data.type == "success" ? true : false;
             }
             else{
@@ -48,11 +47,13 @@ const authOptions = NextAuth({
         },
         async session({ session, token }) {
             // Send properties to the client, like an access_token from a provider.
+            const userDetails = await fetchUser(session.user["email"], token.id_token);
+            console.log("----userdetails:",userDetails)
             session["id_token"] = token.id_token;
             session["access_token"] = token.access_token;
             session.user["firstName"] = token.firstName;
             session.user["lastName"] = token.lastName;
-            console.log("---",session)
+            session.user["userId"] = userDetails.data.data._id
             return session;
         },
     },

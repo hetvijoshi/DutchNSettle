@@ -5,19 +5,19 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { colors } from "@/styles/colors";
-import classes from "./CustomCard.module.scss";
+import classes from "./FriendCustomCard.module.scss";
 
 
-export const CustomCard = ({ friendDetail }) => {
+export const FriendCustomCard = ({ friendDetail }) => {
     return (
         <Card sx={{ minWidth: 180, padding: 1, margin: 1}}>
             <CardContent sx={{ padding: 0 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <Typography sx={{ fontSize: 18 }} color={colors.black} gutterBottom>
-                        {friendDetail.name}
+                        {friendDetail.user.name}
                     </Typography>
                     <Typography sx={{ fontSize: 18 }} color={friendDetail.balance < 0 ? colors.dangerDefault : colors.successDefault} gutterBottom>
-                        {"$" + friendDetail.balance}
+                        {"$" + friendDetail.amount}
                     </Typography>
                 </div>
             </CardContent>

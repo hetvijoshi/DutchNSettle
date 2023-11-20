@@ -8,8 +8,8 @@ import TabPanel from "@mui/lab/TabPanel";
 import CustomTabPanel from "../CustomTabPanel/CustomTabPanel";
 import { Button } from "@mui/material";
 import classes from "./Tabs.module.scss"
-import AddFriendDialog from "../AddFriendDialog/AddFriendDialog";
-const AddGroupDialog = lazy(() => import("../AddGroupDialog/AddGroupDialog"))
+import AddFriendDialog from "../CustomTabPanel/FriendsTab/AddFriendDialog/AddFriendDialog";
+const AddGroupDialog = lazy(() => import("../CustomTabPanel/GroupsTab/AddGroupDialog/AddGroupDialog"))
 
 export default function Tabs({ tabList }) {
     const [value, setValue] = React.useState("1");
@@ -55,7 +55,7 @@ export default function Tabs({ tabList }) {
                         </div>
                     </Box>
                     {tabList.map((tab, index) => (
-                        <TabPanel key={tab} value={(index + 1).toString()}>
+                        <TabPanel key={tab} value={(index + 1).toString()} >
                             <CustomTabPanel tab={tab} />
                         </TabPanel>
                     ))}

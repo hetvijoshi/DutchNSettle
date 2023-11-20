@@ -7,6 +7,7 @@ export const Navbar = () => {
     const settings = [{ title: "Profile", link: "" }, { title: "Account", link: "" }, { title: "Dashboard", link: "" }, { title: "Logout" }];
     const [anchorElUser, setAnchorElUser] = useState(null);
     const { data: session } = useSession()
+
     console.log(session)
 
     const handleOpenUserMenu = (event) => {

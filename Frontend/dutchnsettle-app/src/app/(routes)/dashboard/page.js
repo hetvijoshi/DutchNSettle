@@ -1,11 +1,16 @@
 "use client";
 import { Box, Button, Container, Divider, Grid, Paper, Typography } from "@mui/material"
-import React from "react"
+import React, { useState } from "react"
 import classes from "./dashboard.module.scss"
 import Tabs from "@/components/Tabs/Tabs"
+import FriendsContext from "@/app/lib/utility/context";
 
 const Dashboard = () => {
     const dashboardArray = [{ title: "total balance", dollar: "-$23.1" }, { title: "you owe", dollar: "-$23.54" }, { title: "you are owed", dollar: "$0.02" }]
+
+    //Friends tab
+    const [friends, setFriends] = useState([]);
+    const value = { friends, setFriends };
     return (
         <Container>
             <div>
@@ -37,7 +42,9 @@ const Dashboard = () => {
                         })}
                     </Grid>
                     <Divider sx={{ marginY: "10px" }} />
-                    <Tabs tabList={["Friends", "Groups"]} />
+                    <FriendsContext.Provider value={value}>
+                        <Tabs tabList={["Friends", "Groups"]} />
+                    </FriendsContext.Provider>
                 </Paper>
             </div>
         </Container>

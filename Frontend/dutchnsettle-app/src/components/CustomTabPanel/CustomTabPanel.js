@@ -1,19 +1,18 @@
 import React from "react"
 import FriendsTab from "./FriendsTab/FriendsTab"
+import GroupsTab from "./GroupsTab/GroupsTab"
 
-const CustomTabPanel = ({tab}) => {
-    console.log(tab)
+const CustomTabPanel = ({ tab }) => {
     const renderSwitch = () => {
         switch (tab.toLowerCase()) {
             case "groups":
-                return <div></div>
+                return <GroupsTab />
             case "friends":
                 return <FriendsTab />
         }
     }
     return (
         renderSwitch()
-        
     )
 }
 

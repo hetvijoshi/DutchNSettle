@@ -3,9 +3,11 @@
 import "./globals.css";
 import React from "react";
 import classes from "./layout.module.scss";
-import { Navbar } from "../components/Navbar/Navbar";
 import Providers from "./lib/utility/Providers";
+// import LayoutWrapper from "@/components/LayoutWrapper/LayoutWrapper";
 import { Poppins } from "@next/font/google";
+import { Navbar } from "@/components/Navbar/Navbar";
+
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -21,6 +23,9 @@ export default function RootLayout({ children }) {
             <Navbar />
             {children}
           </main>
+          {/* <LayoutWrapper>
+            {children} */}
+          {/* </LayoutWrapper> */}
         </Providers>
       </body>
     </html>
