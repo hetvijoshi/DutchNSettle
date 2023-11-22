@@ -1,5 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
+var cors = require('cors')
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { OAuth2Client } = require('google-auth-library');
@@ -7,6 +8,7 @@ const db = require('./db');
 
 var app = express();
 
+app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
