@@ -1,0 +1,7 @@
+@import "../../../styles/colors.scss";
+
+.card_wrapper {
+    display: flex;
+    // justify-content: space-between;
+    flex-wrap: wrap;
+}

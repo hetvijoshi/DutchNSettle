@@ -1,0 +1,9 @@
+@import "../../styles/colors.scss";
+
+.link_style {
+    text-decoration: none;
+    color: $secondary--blue;
+    &:hover {
+        color: $background-right;
+    }
+}

@@ -1,0 +1,26 @@
+@import "../../styles/colors.scss";
+
+.add_friends_button {
+    background-color: $secondary--darkblue;
+    color: $white;
+    text-transform: none;
+    border: 2px solid $secondary--darkblue ;
+
+    &:hover {
+        color: $secondary--darkblue !important;
+        border: 2px solid $secondary--darkblue ;
+    }
+}
+
+.add_group_button {
+    margin-left: 20px;
+    background-color: $secondary--blue;
+    color: $white;
+    text-transform: none;
+    border: 2px solid $secondary--blue ;
+
+    &:hover {
+        color: $secondary--blue !important;
+        border: 2px solid $secondary--blue ;
+    }
+}
