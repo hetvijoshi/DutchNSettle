@@ -7,38 +7,22 @@ class GroupController {
     static async createGroup(req, res) {
         try {
             const payload = req.body;
-            let duplicateGroups = await checkDuplicateGroup(payload);
+            let group = await createGroup(payload);
+            group.save();
 
-            if (duplicateGroups && duplicateGroups.length > 0) {
-                return res.status(200).json({
-                    type: "success",
-                    message: "Group already exist. Try renaming group.",
-                    data: null,
-                });
-            } else {
-                let group = await createGroup(payload);
-                group.save();
+            const { groupMembers } = payload;
 
-                const { groupMembers } = payload;
-
-                for (let i = 0; i < groupMembers.length - 1; i++) {
-                    for (let j = i + 1; j < groupMembers.length; j++) {
-                        let friendRecords = await getFriendsListByUserIds([groupMembers[i].user, groupMembers[j].user]);
-                        let friend = friendRecords.find(f => f.user.toString() == groupMembers[i].user);
-                        if (friend) {
-                            if (friend.friends.length > 0) {
-                                if (friend.friends.find(f => f.user.toString() == groupMembers[j].user) == undefined) {
-                                    friend.friends = [...friend.friends, { user: groupMembers[j].user }];
-                                    friend.save();
-
-                                }
-                            } else {
-                                friend = new Friends();
-                                friend.user = groupMembers[i].user;
-                                friend.friends = [{ user: groupMembers[j].user }];
+            for (let i = 0; i < groupMembers.length - 1; i++) {
+                for (let j = i + 1; j < groupMembers.length; j++) {
+                    let friendRecords = await getFriendsListByUserIds([groupMembers[i].user, groupMembers[j].user]);
+                    let friend = friendRecords.find(f => f.user.toString() == groupMembers[i].user);
+                    if (friend) {
+                        if (friend.friends.length > 0) {
+                            if (friend.friends.find(f => f.user.toString() == groupMembers[j].user) == undefined) {
+                                friend.friends = [...friend.friends, { user: groupMembers[j].user }];
                                 friend.save();
-                            }
 
+                            }
                         } else {
                             friend = new Friends();
                             friend.user = groupMembers[i].user;
@@ -46,17 +30,18 @@ class GroupController {
                             friend.save();
                         }
 
-                        friend = friendRecords.find(f => f.user.toString() == groupMembers[j].user);
-                        if (friend) {
-                            if (friend.friends.length > 0) {
-                                if (friend.friends.find(f => f.user.toString() == groupMembers[i].user) == undefined) {
-                                    friend.friends = [...friend.friends, { user: groupMembers[i].user }];
-                                    friend.save();
-                                }
-                            } else {
-                                friend = new Friends();
-                                friend.user = groupMembers[j].user;
-                                friend.friends = [{ user: groupMembers[i].user }];
+                    } else {
+                        friend = new Friends();
+                        friend.user = groupMembers[i].user;
+                        friend.friends = [{ user: groupMembers[j].user }];
+                        friend.save();
+                    }
+
+                    friend = friendRecords.find(f => f.user.toString() == groupMembers[j].user);
+                    if (friend) {
+                        if (friend.friends.length > 0) {
+                            if (friend.friends.find(f => f.user.toString() == groupMembers[i].user) == undefined) {
+                                friend.friends = [...friend.friends, { user: groupMembers[i].user }];
                                 friend.save();
                             }
                         } else {
@@ -65,25 +50,28 @@ class GroupController {
                             friend.friends = [{ user: groupMembers[i].user }];
                             friend.save();
                         }
+                    } else {
+                        friend = new Friends();
+                        friend.user = groupMembers[j].user;
+                        friend.friends = [{ user: groupMembers[i].user }];
+                        friend.save();
                     }
-                }
-
-                if (group) {
-                    return res.status(200).json({
-                        type: "success",
-                        message: "Success result",
-                        data: (await group.populate("createdBy")).populate("groupMembers.user"),
-                    });
-                } else {
-                    return res.status(200).json({
-                        type: "success",
-                        message: "Success result",
-                        data: null,
-                    });
                 }
             }
 
-
+            if (group) {
+                return res.status(200).json({
+                    type: "success",
+                    message: "Success result",
+                    data: (await group.populate("createdBy")).populate("groupMembers.user"),
+                });
+            } else {
+                return res.status(200).json({
+                    type: "success",
+                    message: "Success result",
+                    data: null,
+                });
+            }
 
         } catch (error) {
             return res.status(500).json({

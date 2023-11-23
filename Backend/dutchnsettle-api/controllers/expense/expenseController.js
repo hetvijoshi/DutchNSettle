@@ -30,7 +30,7 @@ class ExpenseController {
                         let expenseDetails = await addExpenseDetails(expenseDetailPayload);
                         if (expenseDetails) {
                             let paidByUser = await getFriendsListByUserId(paidBy);
-                            expenseDetailPayload.map(async (share) => {
+                            for (const share in expenseDetailPayload) {
                                 let friend1 = paidByUser.friends.find(f => f.user._id.toString() == share.paidFor);
                                 friend1.amount = friend1.amount + share.amount;
                                 let paidForUser = await getFriendsListByUserId(share.paidFor);
@@ -38,7 +38,7 @@ class ExpenseController {
                                 friend2.amount = friend2.amount - share.amount;
                                 paidByUser.save();
                                 paidForUser.save();
-                            });
+                            }
                         }
                         return res.status(200).json({
                             type: "success",
@@ -46,13 +46,25 @@ class ExpenseController {
                             data: { expense, expenseDetails },
                         });
                     } else {
-                        return res.status(200).json({
-                            type: "success",
-                            message: "Success result",
+                        return res.status(400).json({
+                            type: "fail",
+                            message: "Something went wrong",
                             data: null,
                         });
                     }
+                } else {
+                    return res.status(400).json({
+                        type: "fail",
+                        message: "User not found",
+                        data: null,
+                    });
                 }
+            } else {
+                return res.status(400).json({
+                    type: "fail",
+                    message: "Invalid payload. Missing PaidBy user.",
+                    data: null,
+                });
             }
         } catch (error) {
             return res.status(500).json({
@@ -93,7 +105,7 @@ class ExpenseController {
                                 const share = expenseDetailPayload[i];
 
                                 //Skip payer's own expense record.
-                                if(share.paidFor == paidBy){
+                                if (share.paidFor == paidBy) {
                                     continue;
                                 }
 
@@ -101,7 +113,7 @@ class ExpenseController {
                                 friend1.amount = friend1.amount + share.amount;
 
                                 paidByGroupUser.amount = paidByGroupUser.amount + share.amount;
-                                
+
 
                                 let paidForUser = await getFriendsListByUserId(share.paidFor);
                                 let friend2 = paidForUser.friends.find(f => f.user._id.toString() == paidBy);
@@ -109,7 +121,7 @@ class ExpenseController {
 
                                 let paidForGroupUser = groupDetail.groupMembers.find(member => member.user._id.toString() == share.paidFor);
                                 paidForGroupUser.amount = paidForGroupUser.amount - share.amount;
-                                
+
                                 paidForUser.save();
                             }
                             paidByUser.save();
@@ -129,34 +141,6 @@ class ExpenseController {
                     }
                 }
             }
-        } catch (error) {
-            return res.status(500).json({
-                type: "error",
-                message: error.message || "Unhandled Error",
-                error,
-            });
-        }
-    }
-
-    static async addExpenseDetails(req, res) {
-        try {
-            const payload = req.body;
-            let expense = await addExpenseDetails(payload);
-            expense.save();
-            if (expense) {
-                return res.status(200).json({
-                    type: "success",
-                    message: "Success result",
-                    data: expense,
-                });
-            } else {
-                return res.status(200).json({
-                    type: "success",
-                    message: "Success result",
-                    data: null,
-                });
-            }
-
         } catch (error) {
             return res.status(500).json({
                 type: "error",
