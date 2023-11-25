@@ -1,0 +1,12 @@
+@import './../../../styles/colors.scss';
+
+.center_paper {
+    height: 100vh;
+    padding-top: 2%;
+    margin-top: 2%;
+    padding-left: 10px;
+    padding-right: 10px;
+    background: rgba(57, 57, 57, 0.1);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 10px #00000059;
+}

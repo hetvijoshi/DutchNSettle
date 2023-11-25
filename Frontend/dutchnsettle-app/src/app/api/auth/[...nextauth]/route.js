@@ -47,6 +47,7 @@ const authOptions = NextAuth({
         },
         async session({ session, token }) {
             // Send properties to the client, like an access_token from a provider.
+            console.log("Email-",session.user)
             const userDetails = await fetchUser(session.user["email"], token.id_token);
             console.log("----userdetails:",userDetails)
             session["id_token"] = token.id_token;

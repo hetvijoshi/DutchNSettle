@@ -28,8 +28,8 @@ const FriendsTab = () => {
             {
                 session && (
                     <div className={classes.card_wrapper}>
-                        {friendsList?.map((friend) => (
-                            <FriendCustomCard key={friend.user.name} friendDetail={friend} />
+                        {friendsList?.map((friend,index) => (
+                            <FriendCustomCard key={friend.user.name + index} friendDetail={friend} />
                         ))}
                     </div>
                 )

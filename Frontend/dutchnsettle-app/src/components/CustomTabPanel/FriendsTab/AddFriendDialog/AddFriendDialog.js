@@ -32,8 +32,6 @@ export default function AddFriendDialog({ open, handleClose }) {
         getDropDownvalues(value);
     };
 
-    const fetchAllFriends
-
     const addToFriendList = async (result) => {
         const payload = { friendEmail: result.email }
         const token = session["id_token"]
