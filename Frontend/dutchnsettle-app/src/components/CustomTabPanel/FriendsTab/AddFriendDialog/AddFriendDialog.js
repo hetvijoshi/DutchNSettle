@@ -7,8 +7,8 @@ import { Box, Button, DialogActions, Typography } from "@mui/material";
 import { useContext, useState } from "react";
 import SearchWrapper from "../../../SearchWrapper/SearchWrapper";
 import { useSession } from "next-auth/react";
-import { addFriend, getSearchResults } from "@/app/services/FriendsService";
-import FriendsContext from "@/app/lib/utility/context";
+import { addFriend, getFriends, getSearchResults } from "@/app/services/FriendsService";
+import { FriendsContext } from "@/app/lib/utility/context";
 
 export default function AddFriendDialog({ open, handleClose }) {
 
@@ -18,7 +18,7 @@ export default function AddFriendDialog({ open, handleClose }) {
 
     const { data: session } = useSession();
 
-    const friends = useContext(FriendsContext);
+    const { setFriends } = useContext(FriendsContext);
 
     const getDropDownvalues = async (value) => {
         const searchResult = await getSearchResults(value, session["id_token"])
@@ -32,14 +32,22 @@ export default function AddFriendDialog({ open, handleClose }) {
         getDropDownvalues(value);
     };
 
+    const fetchAllFriends = async () => {
+        const token = session["id_token"]
+        const userId = session.user["userId"]
+        const response = await getFriends(userId, token)
+        const friendList = response.data.friends ? response.data.friends : [];
+        setFriends(friendList);
+    }
+
     const addToFriendList = async (result) => {
         const payload = { friendEmail: result.email }
         const token = session["id_token"]
         const addFriends = await addFriend(payload, token)
-        console.log(addFriends)
         if (addFriends) {
             alert(addFriends.message)
             handleClose()
+            fetchAllFriends()
         }
     }
 
