@@ -1,4 +1,4 @@
-"use client";
+    "use client";
 import { Box, Button, Container, Divider, Grid, Paper, Typography } from "@mui/material"
 import React, { useState } from "react"
 import classes from "./dashboard.module.scss"
@@ -36,7 +36,7 @@ const Dashboard = () => {
                                             <Typography variant="body1" >{dashItem.dollar}</Typography>
                                         </Box>
                                     </Grid>
-                                    {index != dashboardArray.length - 1 && <Divider orientation="vertical" flexItem />}
+                                    {index != dashboardArray.length - 1 && <Divider key={dashItem.title} orientation="vertical" flexItem />}
                                 </>
                             )
                         })}
