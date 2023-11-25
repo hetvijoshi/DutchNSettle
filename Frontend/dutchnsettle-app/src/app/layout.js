@@ -4,7 +4,7 @@ import "./globals.css";
 import React from "react";
 import classes from "./layout.module.scss";
 import Providers from "./lib/utility/Providers";
-// import LayoutWrapper from "@/components/LayoutWrapper/LayoutWrapper";
+import LayoutWrapper from "@/components/LayoutWrapper/LayoutWrapper";
 import { Poppins } from "@next/font/google";
 import { Navbar } from "@/components/Navbar/Navbar";
 
@@ -19,13 +19,13 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${classes.remove_margin_padding}`}>
         <Providers>
-          <main className={poppins.className}>
+          {/* <main className={poppins.className}>
             <Navbar />
             {children}
-          </main>
-          {/* <LayoutWrapper>
-            {children} */}
-          {/* </LayoutWrapper> */}
+          </main> */}
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
         </Providers>
       </body>
     </html>

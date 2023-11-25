@@ -3,7 +3,7 @@ import { FaSearch } from "react-icons/fa";
 
 import classes from "./SearchBar.module.scss"
 
-export const SearchBar = ({ handleChange, onBlur }) => {
+export const SearchBar = ({ handleChange, onBlur, inputValue }) => {
     const [input, setInput] = useState("");
 
     const inputChange = (value) => {
@@ -16,7 +16,7 @@ export const SearchBar = ({ handleChange, onBlur }) => {
             <FaSearch id="search-icon" />
             <input
                 placeholder="Type to search..."
-                value={input}
+                value={inputValue ? inputValue : input}
                 onChange={(e) => inputChange(e.target.value)}
                 className={classes.input}
                 onBlur={onBlur}

@@ -5,16 +5,18 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { Avatar, Box, Button, DialogActions, IconButton, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import SearchWrapper from "../../../SearchWrapper/SearchWrapper";
 import { getSearchResults } from "@/app/services/FriendsService";
 import { IoCloseSharp } from "react-icons/io5";
-import { createGroup } from "@/app/services/GroupService";
+import { createGroup, getGroupsByUser } from "@/app/services/GroupService";
+import { GroupsContext } from "@/app/lib/utility/context";
 
 
 export default function AddGroupDialog({ open, handleClose }) {
     const [groupMembers, setGroupMembers] = useState([])
     const [groupName, setGroupName] = useState("");
+    const {setGroups}= useContext(GroupsContext);
     const { data: session } = useSession()
 
     const [results, setResults] = useState([]);
@@ -46,19 +48,24 @@ export default function AddGroupDialog({ open, handleClose }) {
         setGroupMembers(filteredGroupMembers)
     }
 
+    const fetchAllGroups = async () => {
+        const token = session["id_token"]
+        const userId = session.user["userId"]
+        const response = await getGroupsByUser(userId, token)
+        setGroups(response.data)
+      }
+
     const submitGroup = async () => {
         const payload = {}
-        console.log(groupName)
         payload["groupName"] = groupName;
         payload["groupIcon"] = "";
-        console.log(groupMembers);
         payload["groupMembers"] = groupMembers.map(member => { return { user: member._id } })
         payload["createdBy"] = session?.user["userId"];
-        console.log(payload);
         if (groupName && groupName != "" && groupMembers.length > 1) {
             const response = await createGroup(payload, session["id_token"])
             if (response.type == "success") {
                 alert("Group created successfully")
+                fetchAllGroups()
             }
             else {
                 alert("Something went wrong")
@@ -76,7 +83,6 @@ export default function AddGroupDialog({ open, handleClose }) {
         loggedInMember["picture"] = session?.user?.image
         loggedInMember["_id"] = session?.user["userId"]
         setGroupMembers([...groupMembers, loggedInMember])
-        console.log(loggedInMember)
     }, [])
 
     return (
