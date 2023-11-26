@@ -63,7 +63,6 @@ const Dashboard = () => {
         const uniqueMembers = [...new Map(expense.members.map(item => [item._id, item])).values()]
         setExpense({ ...expense, members: uniqueMembers })
 
-        console.log(friends);
         let owe = 0;
         let areOwe = 0;
         friends.forEach((friend) => {

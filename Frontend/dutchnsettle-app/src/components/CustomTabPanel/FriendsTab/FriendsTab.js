@@ -19,7 +19,7 @@ const FriendsTab = () => {
     }
 
     useEffect(() => {
-        if (session) {
+        if (session && friends.length <= 0) {
             fetchAllFriends()
         }
     }, [session])
