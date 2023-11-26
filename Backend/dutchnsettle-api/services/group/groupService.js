@@ -1,4 +1,3 @@
-const { ObjectId } = require("mongodb");
 const { Group } = require("../../models");
 
 exports.createGroup = (data) => {
@@ -12,6 +11,16 @@ exports.createGroup = (data) => {
 }
 
 exports.addMember = (data) => {
+    let result;
+    try {
+        result = Group.findById(data);
+    } catch (error) {
+        return Promise.reject(error);
+    }
+    return result;
+}
+
+exports.updateGroup = (data) => {
     let result;
     try {
         result = Group.findById(data);
@@ -38,6 +47,19 @@ exports.getGroupsForUser = (id) => {
             "groupMembers.user": { "$eq": id }
         };
         result = Group.find(matchQuery).populate("groupMembers.user").lean();
+    } catch (error) {
+        return Promise.reject(error);
+    }
+    return result;
+}
+
+exports.checkDuplicateGroup = (data) => {
+    let result;
+    try {
+        let matchQuery = {
+            groupName: data.groupName
+        };
+        result = Group.find(matchQuery);
     } catch (error) {
         return Promise.reject(error);
     }

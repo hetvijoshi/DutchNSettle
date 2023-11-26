@@ -6,6 +6,7 @@ const expenseSchema = new Schema({
     expenseAmount: { type: Schema.Types.Number, require: true },
     groupId: { type: Schema.Types.ObjectId, ref: "Group" },
     paidBy: { type: Schema.Types.ObjectId, ref: "User", require: true },
+    expenseDate: { type: Date, default: Date.now },
     createdDate: { type: Date, default: Date.now },
     modifiedDate: { type: Date, default: Date.now },
 });
