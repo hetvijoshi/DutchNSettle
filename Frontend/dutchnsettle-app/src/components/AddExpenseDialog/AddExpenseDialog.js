@@ -63,11 +63,11 @@ const AddExpenseDialog = ({ open, handleClose }) => {
     const handleSubmit = async () => {
         const payload = {}
         payload["expenseName"] = expense.description
-        payload["expenseAmount"] = expense.amount
+        payload["expenseAmount"] = Number(expense.amount)
         payload["paidBy"] = expense.loggedInMember._id
         payload["expenseDate"] = new Date().toISOString()
         const memberShares = expense.members.map(member => {
-            return { paidFor: member._id, amount: member.share, splitType: expense.selectedOption.splitType }
+            return { paidFor: member._id, amount: Number(member.share), splitType: expense.selectedOption.splitType }
         })
         payload["shares"] = memberShares
         const token = session["id_token"]

@@ -7,7 +7,7 @@ exports.createUserEntityValidator = (req, res, next) => {
         firstName: Joi.string().required(),
         lastName: Joi.string(),
         picture: Joi.string().uri(),
-        Phone: Joi.number().min(100000000).max(9999999999),
+        phone: Joi.number().min(100000000).max(9999999999),
         name: Joi.string().required()
     });
     const { error } = schema.validate(payload);
@@ -82,7 +82,7 @@ exports.updateUserValidator = (req, res, next) => {
         firstName: Joi.string().required(),
         lastName: Joi.string(),
         picture: Joi.string().uri(),
-        Phone: Joi.number().min(100000000).max(9999999999),
+        phone: Joi.number().min(100000000).max(9999999999),
         name: Joi.string().required()
     });
     const { error } = schema.validate(payload);

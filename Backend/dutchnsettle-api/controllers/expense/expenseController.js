@@ -30,15 +30,17 @@ class ExpenseController {
                         let expenseDetails = await addExpenseDetails(expenseDetailPayload);
                         if (expenseDetails) {
                             let paidByUser = await getFriendsListByUserId(paidBy);
-                            for (const share in expenseDetailPayload) {
-                                let friend1 = paidByUser.friends.find(f => f.user._id.toString() == share.paidFor);
-                                friend1.amount = friend1.amount + share.amount;
-                                let paidForUser = await getFriendsListByUserId(share.paidFor);
-                                let friend2 = paidForUser.friends.find(f => f.user._id.toString() == paidBy);
-                                friend2.amount = friend2.amount - share.amount;
-                                paidByUser.save();
-                                paidForUser.save();
-                            }
+                            expenseDetailPayload.forEach(async (share) => {
+                                if (share.paidFor != paidBy) {
+                                    let friend1 = paidByUser.friends.find(f => f.user._id.toString() == share.paidFor);
+                                    friend1.amount = friend1.amount + share.amount;
+                                    let paidForUser = await getFriendsListByUserId(share.paidFor);
+                                    let friend2 = paidForUser.friends.find(f => f.user._id.toString() == paidBy);
+                                    friend2.amount = friend2.amount - share.amount;
+                                    paidByUser.save();
+                                    paidForUser.save();
+                                }
+                            })
                         }
                         return res.status(200).json({
                             type: "success",

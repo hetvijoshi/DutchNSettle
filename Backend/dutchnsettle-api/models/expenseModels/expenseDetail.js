@@ -8,7 +8,8 @@ const expenseDetailSchema = new Schema({
     amount: { type: Schema.Types.Number, require: true },
     splitType: { type: Schema.Types.String, enum: Object.keys(SPLIT_TYPE), require: true },
     createdDate: { type: Date, default: Date.now },
-    modifiedDate: { type: Date, default: Date.now }
+    modifiedDate: { type: Date, default: Date.now },
+    expenseSettled: { type: Schema.Types.Number, default: 0, require: true }
 });
 
 module.exports = model("ExpenseDetail", expenseDetailSchema);

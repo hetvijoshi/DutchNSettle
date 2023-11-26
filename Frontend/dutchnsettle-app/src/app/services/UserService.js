@@ -14,3 +14,17 @@ export const getUserDetails = async (id, token) => {
 
     return response.data
 }
+
+export const putUserDetails = async (data, token) => {
+    let response;
+    const config = {
+        headers: { Authorization: `Bearer ${token}` }
+    };
+    try {
+        response = await Nextclient.put("/user", data, config);
+    }
+    catch (err) {
+        console.log("Error", err)
+    }
+    return response.data
+}
