@@ -5,6 +5,7 @@ import { getSearchResults } from "@/app/services/FriendsService";
 import AutoComplete from "../AutoComplete/AutoComplete";
 import SplitOptionsSection from "./SplitOptionsSection/SplitOptionsSection";
 import { ExpenseContext } from "@/app/lib/utility/context";
+import { addIndividualExpense } from "@/app/services/ExpenseService";
 
 const AddExpenseDialog = ({ open, handleClose }) => {
     const { expense, setExpense } = useContext(ExpenseContext)
@@ -57,6 +58,24 @@ const AddExpenseDialog = ({ open, handleClose }) => {
         if (!expense.description) { err.description = "Please enter description" }
         if (!expense.amount) { err.amount = "Please enter amount" }
         setErrors(err)
+    }
+
+    const handleSubmit = async () => {
+        const payload = {}
+        payload["expenseName"] = expense.description
+        payload["expenseAmount"] = expense.amount
+        payload["paidBy"] = expense.loggedInMember._id
+        payload["expenseDate"] = new Date().toISOString()
+        const memberShares = expense.members.map(member => {
+            return { paidFor: member._id, amount: member.share, splitType: expense.selectedOption.splitType }
+        })
+        payload["shares"] = memberShares
+        const token = session["id_token"]
+        const addExpense = await addIndividualExpense(payload, token)
+        if (addExpense) {
+            alert(addExpense.message)
+            handleClose()
+        }
     }
 
     return (
@@ -120,7 +139,7 @@ const AddExpenseDialog = ({ open, handleClose }) => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleClose}>Submit</Button>
+                    <Button onClick={handleSubmit}>Submit</Button>
                 </DialogActions>
             </Dialog>
         </React.Fragment>

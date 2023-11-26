@@ -18,22 +18,26 @@ const Dashboard = () => {
         {
             name: "Split equally",
             icon: <FaEquals />,
-            chipText: "equally"
+            chipText: "equally",
+            splitType:"BY_EQUALLY"
         },
         {
             name: "Split by exact amounts",
             icon: <TbDecimal />,
-            chipText: "unequally"
+            chipText: "unequally",
+            splitType:"BY_AMOUNTS"
         },
         {
             name: "Split by percentages",
             icon: <FaPercentage />,
-            chipText: "unequally"
+            chipText: "unequally",
+            splitType:"BY_PERCENTAGE"
         },
         {
             name: "Split by shares",
             icon: <FaChartBar />,
-            chipText: "unequally"
+            chipText: "unequally",
+            splitType:"BY_SHARE"
         },
     ]
 
