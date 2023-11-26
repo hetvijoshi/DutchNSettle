@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Box, Chip } from "@mui/material";
 import { ExpenseContext } from "@/app/lib/utility/context";
 
-export default function AutoComplete({ handleChange }) {
+export default function AutoComplete({ handleChange, errors }) {
 
     const [input, setInput] = useState("");
 
@@ -19,11 +19,8 @@ export default function AutoComplete({ handleChange }) {
     const handleAutocomplete = (array) => {
         setExpense({ ...expense, results: [] })
         const members = [expense.loggedInMember, ...array]
-        console.log(members)
-        // setResults([]);
         let uniqueValues = [...new Map(members.map(item => [item._id, item])).values()]
         uniqueValues = uniqueValues.map(member => { return { ...member, checked: true } });
-        console.log(uniqueValues)
         setExpense({ ...expense, members: uniqueValues })
     }
 
@@ -37,8 +34,8 @@ export default function AutoComplete({ handleChange }) {
                 onChange={(event, value) => handleAutocomplete(value)}
                 renderOption={(props, option) => {
                     return (
-                        <li {...props} key={option._id}>
-                            {option.name}
+                        <li {...props} key={option?._id}>
+                            {option?.name}
                         </li>
                     )
                 }}
@@ -51,10 +48,12 @@ export default function AutoComplete({ handleChange }) {
 
                 renderInput={(params) => (
                     <TextField
+                        error={errors ? true : false}
                         {...params}
                         variant="standard"
                         onChange={(e) => { inputChange(e.target.value) }}
                         value={input}
+                        helperText={errors}
                     />
                 )}
             />}

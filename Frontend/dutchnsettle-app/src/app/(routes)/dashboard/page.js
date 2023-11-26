@@ -6,17 +6,41 @@ import Tabs from "@/components/Tabs/Tabs"
 import { ExpenseContext, FriendsContext, GroupsContext } from "@/app/lib/utility/context";
 import AddExpenseDialog from "@/components/AddExpenseDialog/AddExpenseDialog";
 import { useSession } from "next-auth/react";
+import { TbDecimal } from "react-icons/tb";
+import { FaEquals } from "react-icons/fa";
+import { FaPercentage } from "react-icons/fa";
+import { FaChartBar } from "react-icons/fa6";
 
 const Dashboard = () => {
     const dashboardArray = [{ title: "total balance", dollar: "-$23.1" }, { title: "you owe", dollar: "-$23.54" }, { title: "you are owed", dollar: "$0.02" }]
 
-    //Friends tab 
+    const splitOptions = [
+        {
+            name: "Split equally",
+            icon: <FaEquals />,
+            chipText: "equally"
+        },
+        {
+            name: "Split by exact amounts",
+            icon: <TbDecimal />,
+            chipText: "unequally"
+        },
+        {
+            name: "Split by percentages",
+            icon: <FaPercentage />,
+            chipText: "unequally"
+        },
+        {
+            name: "Split by shares",
+            icon: <FaChartBar />,
+            chipText: "unequally"
+        },
+    ]
+
     const [friends, setFriends] = useState([]);
     const [groups, setGroups] = useState([]);
     const [expense, setExpense] = useState({
-        results: [], description: "", amount: "", members: [], loggedInMember: {}, openSplitScreen: false, selectedoption: {
-            name: "", chipText: "", icon: ""
-        }
+        results: [], description: "", amount: "", members: [], loggedInMember: {}, openSplitScreen: false, selectedOption: splitOptions[0], splitOptions: splitOptions
     });
 
     const { data: session } = useSession();
@@ -25,11 +49,10 @@ const Dashboard = () => {
         const loggedInMember = { ...session.user };
         loggedInMember["picture"] = session?.user?.image
         loggedInMember["_id"] = session?.user["userId"]
-        expense.loggedInMember=loggedInMember
+        expense.loggedInMember = loggedInMember
         expense.members.push(loggedInMember)
         const uniqueMembers = [...new Map(expense.members.map(item => [item._id, item])).values()]
         setExpense({ ...expense, members: uniqueMembers })
-        console.log("hello", expense)
     }, [])
 
     const friendsValue = { friends, setFriends };
@@ -38,12 +61,21 @@ const Dashboard = () => {
 
     const [openAddExpense, setOpenAddExpense] = React.useState(false);
 
+    const resetExpenseContext = () => {
+        const loggedInMember = { ...session.user };
+        loggedInMember["picture"] = session?.user?.image
+        loggedInMember["_id"] = session?.user["userId"]
+        setExpense({ results: [], description: "", amount: "", members: [loggedInMember], loggedInMember: loggedInMember, openSplitScreen: false, selectedOption: splitOptions[0], splitOptions: splitOptions })
+    }
+
     const clickOpenAddExpense = () => {
         setOpenAddExpense(true);
+        resetExpenseContext()
     };
 
     const closeAddExpense = () => {
         setOpenAddExpense(false);
+        resetExpenseContext()
     };
 
     return (
