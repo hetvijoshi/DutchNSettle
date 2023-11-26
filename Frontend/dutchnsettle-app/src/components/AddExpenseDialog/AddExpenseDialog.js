@@ -63,12 +63,26 @@ const AddExpenseDialog = ({ open, handleClose }) => {
     const handleSubmit = async () => {
         const payload = {}
         payload["expenseName"] = expense.description
-        payload["expenseAmount"] = expense.amount
+        payload["expenseAmount"] = Number(expense.amount)
         payload["paidBy"] = expense.loggedInMember._id
         payload["expenseDate"] = new Date().toISOString()
-        const memberShares = expense.members.map(member => {
-            return { paidFor: member._id, amount: member.share, splitType: expense.selectedOption.splitType }
-        })
+        let memberShares = []
+        if (expense.selectedOption.splitType == "BY_EQUALLY" || expense.selectedOption.splitType == "BY_AMOUNTS") {
+            memberShares = expense.members.map(member => {
+                return { paidFor: member._id, amount: Number(member.share), splitType: expense.selectedOption.splitType }
+            })
+        }
+        else if (expense.selectedOption.splitType == "BY_PERCENTAGE") {
+            memberShares = expense.members.map(member => {
+                return { paidFor: member._id, amount: Number(expense.amount * (member.share / 100)), splitType: expense.selectedOption.splitType }
+            })
+        }
+        else {
+            const totalShare = expense.members.reduce((a, b) => a + (Number(b["share"]) || 0), 0)
+            memberShares = expense.members.map(member => {
+                return { paidFor: member._id, amount: Number((expense.amount * member.share) / totalShare), splitType: expense.selectedOption.splitType }
+            })
+        }
         payload["shares"] = memberShares
         const token = session["id_token"]
         const addExpense = await addIndividualExpense(payload, token)
