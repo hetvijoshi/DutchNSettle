@@ -1,4 +1,4 @@
-    "use client";
+"use client";
 import { Box, Button, Container, Divider, Grid, Paper, Typography } from "@mui/material"
 import React, { useState, useEffect } from "react"
 import classes from "./dashboard.module.scss"
@@ -10,34 +10,35 @@ import { TbDecimal } from "react-icons/tb";
 import { FaEquals } from "react-icons/fa";
 import { FaPercentage } from "react-icons/fa";
 import { FaChartBar } from "react-icons/fa6";
+import { colors } from "@/styles/colors";
 
 const Dashboard = () => {
-    const dashboardArray = [{ title: "total balance", dollar: "-$23.1" }, { title: "you owe", dollar: "-$23.54" }, { title: "you are owed", dollar: "$0.02" }]
+
 
     const splitOptions = [
         {
             name: "Split equally",
             icon: <FaEquals />,
             chipText: "equally",
-            splitType:"BY_EQUALLY"
+            splitType: "BY_EQUALLY"
         },
         {
             name: "Split by exact amounts",
             icon: <TbDecimal />,
             chipText: "unequally",
-            splitType:"BY_AMOUNTS"
+            splitType: "BY_AMOUNTS"
         },
         {
             name: "Split by percentages",
             icon: <FaPercentage />,
             chipText: "unequally",
-            splitType:"BY_PERCENTAGE"
+            splitType: "BY_PERCENTAGE"
         },
         {
             name: "Split by shares",
             icon: <FaChartBar />,
             chipText: "unequally",
-            splitType:"BY_SHARE"
+            splitType: "BY_SHARE"
         },
     ]
 
@@ -48,6 +49,10 @@ const Dashboard = () => {
     });
 
     const { data: session } = useSession();
+    const friendsValue = { friends, setFriends };
+
+
+    const [dashboardArray, setDashboardArray] = useState([{ title: "Total balance", amount: -23.1 }, { title: "You owe", amount: -23.54 }, { title: "You are owed", amount: 0.02 }]);
 
     useEffect(() => {
         const loggedInMember = { ...session.user };
@@ -57,9 +62,25 @@ const Dashboard = () => {
         expense.members.push(loggedInMember)
         const uniqueMembers = [...new Map(expense.members.map(item => [item._id, item])).values()]
         setExpense({ ...expense, members: uniqueMembers })
-    }, [])
 
-    const friendsValue = { friends, setFriends };
+        console.log(friends);
+        let owe = 0;
+        let areOwe = 0;
+        friends.forEach((friend) => {
+            if (friend.amount < 0) {
+                owe += friend.amount;
+            } else {
+                areOwe += friend.amount;
+            }
+        })
+        let dashboard = [...dashboardArray];
+        dashboard[1].amount = owe;
+        dashboard[2].amount = areOwe;
+        dashboard[0].amount = areOwe + owe;
+        setDashboardArray(dashboard);
+    }, [friends])
+
+
     const groupsValue = { groups, setGroups };
     const expenseValue = { expense, setExpense }
 
@@ -98,13 +119,13 @@ const Dashboard = () => {
                     <Grid container direction="row"
                         justifyContent="space-evenly"
                     >
-                        {dashboardArray.map((dashItem, index) => {
+                        {dashboardArray && dashboardArray?.map((dashItem, index) => {
                             return (
                                 <div key={dashItem.title}>
                                     <Grid item >
                                         <Box>
                                             <Typography variant="body1" >{dashItem.title}</Typography>
-                                            <Typography variant="body1" >{dashItem.dollar}</Typography>
+                                            <Typography variant="body1" color={dashItem.amount < 0 ? colors.dangerDefault : colors.successDefault}>$ {dashItem.amount}</Typography>
                                         </Box>
                                     </Grid>
                                     {index != dashboardArray.length - 1 && <Divider orientation="vertical" flexItem />}
