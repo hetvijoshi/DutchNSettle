@@ -37,10 +37,11 @@ class ExpenseController {
                                     let paidForUser = await getFriendsListByUserId(share.paidFor);
                                     let friend2 = paidForUser.friends.find(f => f.user._id.toString() == paidBy);
                                     friend2.amount = friend2.amount - share.amount;
-                                    paidByUser.save();
                                     paidForUser.save();
                                 }
+                                
                             })
+                            paidByUser.save();
                         }
                         return res.status(200).json({
                             type: "success",
