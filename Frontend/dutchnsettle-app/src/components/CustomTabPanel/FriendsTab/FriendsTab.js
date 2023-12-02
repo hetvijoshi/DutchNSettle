@@ -22,7 +22,7 @@ const FriendsTab = () => {
         if (session && friends.length <= 0) {
             fetchAllFriends()
         }
-    }, [session])
+    }, [session, setFriends])
     return (
         <>
             {

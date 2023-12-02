@@ -49,12 +49,6 @@ const SplitByShares = () => {
             }
         })
         setExpense({ ...expense, members: filteredSplitMembers })
-        const sum = expense.members.reduce((a, b) => a + (Number(b["share"]) || 0), 0)
-        // if (sum != expense.amount) {
-        //     let err = { ...errors };
-        //     err.membersShareSum = "Share amounts doesn't sum up with the expense amount"
-        //     setErrors(err)
-        // }
     }
 
 

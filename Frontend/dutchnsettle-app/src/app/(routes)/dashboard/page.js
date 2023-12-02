@@ -45,7 +45,7 @@ const Dashboard = () => {
     const [friends, setFriends] = useState([]);
     const [groups, setGroups] = useState([]);
     const [expense, setExpense] = useState({
-        results: [], description: "", amount: "", members: [], loggedInMember: {}, openSplitScreen: false, selectedOption: splitOptions[0], splitOptions: splitOptions
+        results: [], description: "", amount: "", members: [], paidBy: "", loggedInMember: {}, openSplitScreen: false, selectedOption: splitOptions[0], splitOptions: splitOptions
     });
 
     const { data: session } = useSession();
@@ -136,12 +136,12 @@ const Dashboard = () => {
                     <FriendsContext.Provider value={friendsValue} >
                         <GroupsContext.Provider value={groupsValue} >
                             <Tabs tabList={["Friends", "Groups"]} />
+                            {openAddExpense &&
+                                <ExpenseContext.Provider value={expenseValue}>
+                                    <AddExpenseDialog open={openAddExpense} handleClose={closeAddExpense} />
+                                </ExpenseContext.Provider>}
                         </GroupsContext.Provider >
                     </FriendsContext.Provider>
-                    {openAddExpense &&
-                        <ExpenseContext.Provider value={expenseValue}>
-                            <AddExpenseDialog open={openAddExpense} handleClose={closeAddExpense} />
-                        </ExpenseContext.Provider>}
                 </Paper>
             </div>
         </Container>

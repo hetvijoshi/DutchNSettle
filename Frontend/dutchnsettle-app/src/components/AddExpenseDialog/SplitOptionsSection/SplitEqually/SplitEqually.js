@@ -30,7 +30,6 @@ const SplitEqually = () => {
                 return { ...member }
             }
         })
-        console.log(filteredSplitMembers);
         const totalChecked = filteredSplitMembers.filter(m => { return m.checked }).length;
         const shareMembers = filteredSplitMembers.map(member => {
             if (member.checked) {
