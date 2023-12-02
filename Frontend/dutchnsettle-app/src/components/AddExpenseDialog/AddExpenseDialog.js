@@ -1,15 +1,21 @@
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material"
+import { Autocomplete, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material"
 import React, { useContext, useState } from "react"
 import { useSession } from "next-auth/react";
-import { getSearchResults } from "@/app/services/FriendsService";
+import { getFriends, getSearchResults } from "@/app/services/FriendsService";
 import AutoComplete from "../AutoComplete/AutoComplete";
 import SplitOptionsSection from "./SplitOptionsSection/SplitOptionsSection";
-import { ExpenseContext } from "@/app/lib/utility/context";
+import { ExpenseContext, FriendsContext } from "@/app/lib/utility/context";
 import { addIndividualExpense } from "@/app/services/ExpenseService";
 
 const AddExpenseDialog = ({ open, handleClose }) => {
     const { expense, setExpense } = useContext(ExpenseContext)
     const [errors, setErrors] = useState({ description: "", amount: "", membersInvolved: "", membersShareSum: "" });
+    const { setFriends } = useContext(FriendsContext);
+
+    const defaultProps = {
+        options: expense.members,
+        getOptionLabel: (option) => option.name,
+    };
 
     const handleExpenseDescription = (e) => {
         errors.description = ""
@@ -60,6 +66,14 @@ const AddExpenseDialog = ({ open, handleClose }) => {
         setErrors(err)
     }
 
+    const fetchAllFriends = async () => {
+        const token = session["id_token"]
+        const userId = session.user["userId"]
+        const response = await getFriends(userId, token)
+        const friendList = response.data.friends ? response.data.friends : [];
+        setFriends(friendList);
+    }
+
     const handleSubmit = async () => {
         const payload = {}
         payload["expenseName"] = expense.description
@@ -88,8 +102,19 @@ const AddExpenseDialog = ({ open, handleClose }) => {
         const addExpense = await addIndividualExpense(payload, token)
         if (addExpense) {
             alert(addExpense.message)
+            if (addExpense.type == "success") {
+                fetchAllFriends()
+            }
             handleClose()
         }
+    }
+
+    const handlePaidBy = (e) => {
+        expense.members.map(member => {
+            if (member.name == e.target.value) {
+                expense.paidBy = member._id
+            }
+        })
     }
 
     return (
@@ -143,12 +168,22 @@ const AddExpenseDialog = ({ open, handleClose }) => {
                             />
                         </Grid>
                     </Grid>
-                    <Box justifyContent={"center"} display={"flex"} marginTop={4} gap={1} alignContent={"center"} alignItems={"center"}>
-                        <Typography>Paid by</Typography>
-                        <Chip label="you" variant="filled" onClick={(e) => console.log(e)} />
-                        <Typography>and split</Typography>
-                        <Chip label={expense?.selectedOption?.chipText ? expense?.selectedOption?.chipText : "equally"} variant="filled" clickable onClick={handleSplitScreen} />
-                    </Box>
+                    <div>
+                        <Box justifyContent={"center"} display={"flex"} marginTop={4} gap={1} alignItems={"center"}>
+                            <Typography>Paid by</Typography>
+                            <Autocomplete
+                                sx={{width:"150px"}}
+                                {...defaultProps}
+                                id="disable-close-on-select"
+                                defaultValue={expense.loggedInMember}
+                                renderInput={(params) => {
+                                    return (<TextField {...params} variant="standard" onClick={handlePaidBy} />)
+                                }}
+                            />
+                            <Typography>and split</Typography>
+                            <Chip label={expense?.selectedOption?.chipText ? expense?.selectedOption?.chipText : "equally"} variant="filled" clickable onClick={handleSplitScreen} />
+                        </Box>
+                    </div>
                     {expense.openSplitScreen && <SplitOptionsSection />}
                 </DialogContent>
                 <DialogActions>

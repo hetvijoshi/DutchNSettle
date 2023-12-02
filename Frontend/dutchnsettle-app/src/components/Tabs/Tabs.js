@@ -1,5 +1,5 @@
 "use client";
-import React, { lazy } from "react";
+import React, { lazy, useContext, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
@@ -9,10 +9,12 @@ import CustomTabPanel from "../CustomTabPanel/CustomTabPanel";
 import { Button } from "@mui/material";
 import classes from "./Tabs.module.scss"
 import AddFriendDialog from "../CustomTabPanel/FriendsTab/AddFriendDialog/AddFriendDialog";
+import { FriendsContext } from "@/app/lib/utility/context";
 const AddGroupDialog = lazy(() => import("../CustomTabPanel/GroupsTab/AddGroupDialog/AddGroupDialog"))
 
 export default function Tabs({ tabList }) {
     const [value, setValue] = React.useState("1");
+    const { friends } = useContext(FriendsContext);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -36,6 +38,8 @@ export default function Tabs({ tabList }) {
     const closeAddGroup = () => {
         setOpenAddGroup(false);
     };
+
+    useEffect(() => { }, [friends])
 
     return (
         <>

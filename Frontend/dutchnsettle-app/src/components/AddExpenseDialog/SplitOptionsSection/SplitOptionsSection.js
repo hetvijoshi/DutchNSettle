@@ -1,4 +1,4 @@
-import { Box, Button, ToggleButtonGroup, ToggleButton } from "@mui/material"
+import { Box, ToggleButtonGroup, ToggleButton } from "@mui/material"
 import React, { useContext, useEffect } from "react"
 import { ExpenseContext } from "@/app/lib/utility/context";
 import SplitEqually from "./SplitEqually/SplitEqually"
@@ -29,7 +29,6 @@ const SplitOptionsSection = () => {
     }
 
     useEffect(() => {
-        console.log(expense.selectedOption)
     }, [expense.selectedOption]);
 
     return (
