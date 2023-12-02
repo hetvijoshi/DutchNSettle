@@ -15,8 +15,6 @@ class UserController {
                     isBodyHtml: true,
                     toEmail: user.email,
                     subject: 'Welcome to DutchNSettle!'
-                    toEmail: user.email,
-                    subject: 'Welcome to DutchNSettle!'
                 }
                 await sendEmail(emailData);
             }
