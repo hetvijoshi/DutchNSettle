@@ -10,7 +10,7 @@ import classes from "./FriendCustomCard.module.scss";
 
 export const FriendCustomCard = ({ friendDetail }) => {
     return (
-        <Card sx={{ minWidth: 180, padding: 1, margin: 1}}>
+        <Card sx={{ minWidth: 180, padding: 1, margin: 1 }}>
             <CardContent sx={{ padding: 0 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <Typography sx={{ fontSize: 18 }} color={colors.black} gutterBottom>
@@ -22,7 +22,7 @@ export const FriendCustomCard = ({ friendDetail }) => {
                 </div>
             </CardContent>
             <CardActions sx={{ padding: 0 }}>
-                <Link href="/" className={classes.link_style}>View details</Link>
+                <Link href={`/friends/${friendDetail.user._id}`} className={classes.link_style}>View details</Link>
             </CardActions>
         </Card >
     );

@@ -1,4 +1,5 @@
-const { addExpense, addExpenseDetails } = require("../../services/expense/expenseService");
+const { default: mongoose } = require("mongoose");
+const { addExpense, addExpenseDetails, getUserBalance } = require("../../services/expense/expenseService");
 const { updateGroup } = require("../../services/group/groupService");
 const { getFriendsListByUserId } = require("../../services/user/friendsService");
 const { getUserDetailsById } = require("../../services/user/userService");
@@ -17,12 +18,12 @@ class ExpenseController {
                     let expense = await addExpense(payload);
                     expense.save();
                     if (expense) {
-
                         let expenseDetailPayload = payload.shares?.map(share => {
                             return {
                                 expenseId: expense._id,
-                                paidFor: share.paidFor,
-                                amount: share.amount,
+                                paidBy: expense.paidBy,
+                                paidFor: new mongoose.Types.ObjectId(share.paidFor),
+                                amount: parseFloat(share.amount.toFixed(2)),
                                 splitType: share.splitType
                             };
                         });
@@ -39,7 +40,7 @@ class ExpenseController {
                                     friend2.amount = friend2.amount - share.amount;
                                     paidForUser.save();
                                 }
-                                
+
                             })
                             paidByUser.save();
                         }
@@ -94,6 +95,7 @@ class ExpenseController {
                         let expenseDetailPayload = payload.shares?.map(share => {
                             return {
                                 expenseId: expense._id,
+                                paidBy: expense.paidBy,
                                 paidFor: share.paidFor,
                                 amount: share.amount,
                                 splitType: share.splitType
@@ -143,6 +145,39 @@ class ExpenseController {
                         });
                     }
                 }
+            }
+        } catch (error) {
+            return res.status(500).json({
+                type: "error",
+                message: error.message || "Unhandled Error",
+                error,
+            });
+        }
+    }
+
+    static async fetchUserExpense(req, res) {
+        try {
+            const userId = req.params.id;
+            const friendId = req.params.friendId;
+            let expenses = await getUserBalance(userId);
+
+            expenses = expenses.filter(expense => {
+                return (expense.paidFor._id.toString() == friendId && expense.expenseId.paidBy._id.toString() == userId)
+                    || (expense.paidFor._id.toString() == userId && expense.expenseId.paidBy._id.toString() == friendId)
+            });
+
+            if (expenses) {
+                return res.status(200).json({
+                    type: "success",
+                    message: "Success result",
+                    data: expenses,
+                });
+            } else {
+                return res.status(200).json({
+                    type: "success",
+                    message: "No expenses found",
+                    data: null,
+                });
             }
         } catch (error) {
             return res.status(500).json({

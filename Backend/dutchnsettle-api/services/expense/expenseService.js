@@ -20,3 +20,19 @@ exports.addExpenseDetails = (data) => {
     }
     return result;
 }
+
+exports.getUserBalance = async (id) => {
+    let result;
+    try {
+        let matchQuery = {}
+        result = await ExpenseDetail.find(matchQuery)
+            .populate("paidBy")
+            .populate("paidFor")
+            .populate("expenseId")
+            .sort({ "expenseId.createdDate": "desc" });
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+    return result;
+}
