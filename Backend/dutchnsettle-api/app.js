@@ -1,10 +1,10 @@
 var createError = require('http-errors');
 var express = require('express');
-var cors = require('cors')
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { OAuth2Client } = require('google-auth-library');
 const db = require('./db');
+const cors = require('cors');
 
 var app = express();
 

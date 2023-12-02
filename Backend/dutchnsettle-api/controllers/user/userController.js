@@ -11,9 +11,10 @@ class UserController {
                 user.save();
 
                 const emailData = {
-                    body: 'Your Account has been created.',
+                    body: `Your ${user.name}, Account has been created.`,
                     isBodyHtml: true,
-                    toEmail: user.email
+                    toEmail: user.email,
+                    subject: 'Welcome to DutchNSettle!'
                 }
                 await sendEmail(emailData);
             }

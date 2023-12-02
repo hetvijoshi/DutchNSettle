@@ -16,7 +16,7 @@ export const FriendCustomCard = ({ friendDetail }) => {
                     <Typography sx={{ fontSize: 18 }} color={colors.black} gutterBottom>
                         {friendDetail.user.name}
                     </Typography>
-                    <Typography sx={{ fontSize: 18 }} color={friendDetail.balance < 0 ? colors.dangerDefault : colors.successDefault} gutterBottom>
+                    <Typography sx={{ fontSize: 18 }} color={friendDetail.amount < 0 ? colors.dangerDefault : colors.successDefault} gutterBottom>
                         {"$" + friendDetail.amount}
                     </Typography>
                 </div>

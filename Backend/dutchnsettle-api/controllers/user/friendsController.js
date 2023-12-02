@@ -94,7 +94,7 @@ class FriendsController {
             return res.status(200).json({
                 type: "success",
                 message: "Success result",
-                data: friendRecord,
+                data: friendRecord ? friendRecord : [],
             });
         } catch (error) {
             return res.status(500).json({

@@ -7,7 +7,8 @@ const groupSchema = new Schema({
     groupMembers: {
         type: [
             {
-                user: { type: Schema.Types.ObjectId, ref: "User", required: true }
+                user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+                amount: { type: Schema.Types.Number, default: 0 }
             }
         ],
         require: true

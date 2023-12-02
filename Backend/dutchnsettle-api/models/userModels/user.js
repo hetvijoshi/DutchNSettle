@@ -9,7 +9,7 @@ const userSchema = new Schema({
   picture: String,
   createdDate: { type: Date, default: Date.now },
   modifiedDate: { type: Date, default: Date.now },
-  Phone: Schema.Types.Number
+  phone: Schema.Types.Number
 });
 
 module.exports = model("User", userSchema);
