@@ -16,4 +16,5 @@ export const colors = {
     white: "#ffffff",
     successDefault: "#008000",
     black: "#000000",
+    lightBlue: "#cbdaf1"
 }
