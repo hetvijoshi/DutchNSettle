@@ -51,7 +51,7 @@ const Dashboard = () => {
     const friendsValue = { friends, setFriends };
 
 
-    const [dashboardArray, setDashboardArray] = useState([{ title: "Total balance", amount: -23.1 }, { title: "You owe", amount: -23.54 }, { title: "You are owed", amount: 0.02 }]);
+    const [dashboardArray, setDashboardArray] = useState([{ title: "Total balance", amount: 0 }, { title: "You owe", amount: 0 }, { title: "You are owed", amount: 0 }]);
 
     useEffect(() => {
         const loggedInMember = { ...session.user };
@@ -74,7 +74,7 @@ const Dashboard = () => {
         let dashboard = [...dashboardArray];
         dashboard[1].amount = owe;
         dashboard[2].amount = areOwe;
-        dashboard[0].amount = areOwe + owe;
+        dashboard[0].amount = parseFloat((areOwe + owe).toFixed(2));
         setDashboardArray(dashboard);
     }, [friends])
 

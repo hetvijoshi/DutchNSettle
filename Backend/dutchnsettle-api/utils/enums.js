@@ -1,7 +1,7 @@
 exports.SPLIT_TYPE = {
-    "BY_EQUALLY": 0,
-    "BY_AMOUNTS": 1,
-    "BY_PERCENTAGE": 2,
-    "BY_SHARE": 3,
-    "SETTLED": 4
+    BY_EQUALLY: "BY_EQUALLY",
+    BY_AMOUNTS: "BY_AMOUNTS",
+    BY_PERCENTAGE: "BY_PERCENTAGE",
+    BY_SHARE: "BY_SHARE",
+    SETTLED: "SETTLED"
 }

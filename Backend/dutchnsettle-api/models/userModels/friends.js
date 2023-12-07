@@ -6,7 +6,13 @@ const friendsSchema = new Schema({
     friends: [
         {
             user: { type: Schema.Types.ObjectId, ref: "User", require: true },
-            amount: { type: Schema.Types.Number, default: 0 }
+            amount: { type: Schema.Types.Number, default: 0 },
+            groups: [
+                {
+                    groupId: { type: Schema.Types.ObjectId, ref: "User" },
+                    amount: { type: Schema.Types.Number }
+                }
+            ]
         }
     ],
 });

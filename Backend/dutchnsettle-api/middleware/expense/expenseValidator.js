@@ -6,7 +6,7 @@ exports.individualExpenseValidator = (req, res, next) => {
         expenseName: Joi.string().trim().required().min(2),
         expenseAmount: Joi.number().min(0),
         paidBy: Joi.string().required().min(5),
-        expenseDate: Joi.string().isoDate(),
+        expenseDate: Joi.string().isoDate().required(),
         shares: Joi.array().required().min(1).items(Joi.object(
             {
                 paidFor: Joi.string().trim().required().min(5),
@@ -40,7 +40,7 @@ exports.groupExpenseValidator = (req, res, next) => {
         expenseAmount: Joi.number().min(0),
         paidBy: Joi.string().required().min(5),
         groupId: Joi.string().required().min(5),
-        expenseDate: Joi.string().isoDate(),
+        expenseDate: Joi.string().isoDate().required(),
         shares: Joi.array().required().min(1).items(Joi.object(
             {
                 paidFor: Joi.string().trim().required().min(5),
@@ -53,7 +53,7 @@ exports.groupExpenseValidator = (req, res, next) => {
                     "SETTLED"
                 )
             }
-        )).unique("shares.paidFor")
+        ))
     });
     const { error } = schema.validate(payload);
     if (error) {

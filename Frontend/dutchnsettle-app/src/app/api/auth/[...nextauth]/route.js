@@ -3,9 +3,6 @@ import GoogleProvider from "next-auth/providers/google"
 import jwt from "jsonwebtoken"
 import { createUser, fetchUser } from "@/app/services/AuthService"
 
-
-
-// const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env
 const GOOGLE_CLIENT_ID = "887708871770-p3mli4kh7btf56ri42nnbveefcchqtpv.apps.googleusercontent.com"
 const GOOGLE_CLIENT_SECRET = "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"
 const authOptions = NextAuth({
@@ -28,12 +25,11 @@ const authOptions = NextAuth({
                 user["userId"] = res.data.data._id
                 return res.data.type == "success" ? true : false;
             }
-            else{
+            else {
                 return false
             }
         },
         async jwt({ token, account }) {
-            // Persist the OAuth access_token to the token right after signin
 
             if (account) {
                 const user = jwt.decode(account.id_token);
@@ -46,8 +42,6 @@ const authOptions = NextAuth({
             return token;
         },
         async session({ session, token }) {
-            // Send properties to the client, like an access_token from a provider.
-            console.log("Email-",session.user)
             const userDetails = await fetchUser(session.user["email"], token.id_token);
             session["id_token"] = token.id_token;
             session["access_token"] = token.access_token;

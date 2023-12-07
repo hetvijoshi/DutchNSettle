@@ -11,7 +11,7 @@ class UserController {
                 user.save();
 
                 const emailData = {
-                    body: `Your ${user.name}, Account has been created.`,
+                    body: `Dear ${payload?.name}, Your Account has been created.`,
                     isBodyHtml: true,
                     toEmail: user.email,
                     subject: 'Welcome to DutchNSettle!'
