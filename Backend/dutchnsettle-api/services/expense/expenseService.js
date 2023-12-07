@@ -29,7 +29,8 @@ exports.getUserBalance = async (id) => {
             .populate("paidBy")
             .populate("paidFor")
             .populate("expenseId")
-            .sort({ "expenseId.createdDate": "desc" });
+            .populate({ path: "expenseId", populate: { path: "paidBy" } })
+            .sort({ "expenseId.expenseDate": "desc" });
 
     } catch (error) {
         return Promise.reject(error);
