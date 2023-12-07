@@ -6,12 +6,16 @@ import AutoComplete from "../AutoComplete/AutoComplete";
 import SplitOptionsSection from "./SplitOptionsSection/SplitOptionsSection";
 import { ExpenseContext, FriendsContext } from "@/app/lib/utility/context";
 import { addIndividualExpense } from "@/app/services/ExpenseService";
+import { addGroupExpense } from "@/app/services/GroupService";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 
 const AddExpenseDialog = ({ open, handleClose }) => {
     const { expense, setExpense } = useContext(ExpenseContext)
     const [errors, setErrors] = useState({ description: "", amount: "", membersInvolved: "", membersShareSum: "" });
     const { setFriends } = useContext(FriendsContext);
-
     const defaultProps = {
         options: expense.members,
         getOptionLabel: (option) => option.name,
@@ -74,17 +78,29 @@ const AddExpenseDialog = ({ open, handleClose }) => {
         setFriends(friendList);
     }
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         const payload = {}
         payload["expenseName"] = expense.description
         payload["expenseAmount"] = Number(expense.amount)
-        payload["paidBy"] = expense.loggedInMember._id
-        payload["expenseDate"] = new Date().toISOString()
+        payload["paidBy"] = expense.paidBy
+        payload["expenseDate"] = expense.expenseDate
+        if (expense.isGroup) {
+            postGroupExpense(payload)
+        }
+        else {
+            postIndividualExpense(payload)
+        }
+    }
+
+    const postIndividualExpense = async (payload) => {
+
         let memberShares = []
         if (expense.selectedOption.splitType == "BY_EQUALLY" || expense.selectedOption.splitType == "BY_AMOUNTS") {
             memberShares = expense.members.map(member => {
-                return { paidFor: member._id, amount: Number(member.share), splitType: expense.selectedOption.splitType }
+                const expenseAmount = member.share == undefined || !member.share ? expense.amount / expense.members.length : Number(member.share)
+                return { paidFor: member._id, amount: expenseAmount, splitType: expense.selectedOption.splitType }
             })
+
         }
         else if (expense.selectedOption.splitType == "BY_PERCENTAGE") {
             memberShares = expense.members.map(member => {
@@ -109,12 +125,43 @@ const AddExpenseDialog = ({ open, handleClose }) => {
         }
     }
 
-    const handlePaidBy = (e) => {
-        expense.members.map(member => {
-            if (member.name == e.target.value) {
-                expense.paidBy = member._id
-            }
-        })
+    const postGroupExpense = async (payload) => {
+        payload["groupId"] = expense.groupId
+        let memberShares = []
+        if (expense.selectedOption.splitType == "BY_EQUALLY" || expense.selectedOption.splitType == "BY_AMOUNTS") {
+            memberShares = expense.members.map(member => {
+                const expenseAmount = member.share == undefined || !member.share ? expense.amount / expense.members.length : Number(member.share)
+                return { paidFor: member._id, amount: expenseAmount, splitType: expense.selectedOption.splitType }
+            })
+        }
+        else if (expense.selectedOption.splitType == "BY_PERCENTAGE") {
+            memberShares = expense.members.map(member => {
+                return { paidFor: member._id, amount: Number(expense.amount * (member.share / 100)), splitType: expense.selectedOption.splitType }
+            })
+        }
+        else {
+            const totalShare = expense.members.reduce((a, b) => a + (Number(b["share"]) || 0), 0)
+            memberShares = expense.members.map(member => {
+                return { paidFor: member._id, amount: Number((expense.amount * member.share) / totalShare), splitType: expense.selectedOption.splitType }
+            })
+        }
+        payload["shares"] = memberShares
+        const token = session["id_token"]
+        const addExpense = await addGroupExpense(payload, token)
+        if (addExpense?.type == "success") {
+            alert("Group Expense created successfully")
+        }
+        else {
+            alert("Something went wrong")
+        }
+    }
+
+    const handlePaidBy = (member) => {
+        expense.paidBy = member._id
+    }
+
+    const handleExpenseDate = (e) => {
+        setExpense({ ...expense, expenseDate: e.$d })
     }
 
     return (
@@ -168,16 +215,28 @@ const AddExpenseDialog = ({ open, handleClose }) => {
                             />
                         </Grid>
                     </Grid>
+                    <Grid container sx={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
+                        <Grid item xs={4}>
+                            <Typography><b>Expense date </b></Typography>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker value={expense.expenseDate} onChange={handleExpenseDate} maxDate={dayjs(new Date())}
+                                />
+                            </LocalizationProvider>
+                        </Grid>
+                    </Grid>
                     <div>
                         <Box justifyContent={"center"} display={"flex"} marginTop={4} gap={1} alignItems={"center"}>
                             <Typography>Paid by</Typography>
                             <Autocomplete
-                                sx={{width:"150px"}}
+                                sx={{ width: "150px" }}
                                 {...defaultProps}
                                 id="disable-close-on-select"
                                 defaultValue={expense.loggedInMember}
+                                onChange={(e, newValue) => handlePaidBy(newValue)}
                                 renderInput={(params) => {
-                                    return (<TextField {...params} variant="standard" onClick={handlePaidBy} />)
+                                    return (<TextField {...params} variant="standard" />)
                                 }}
                             />
                             <Typography>and split</Typography>
