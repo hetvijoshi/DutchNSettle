@@ -1,7 +1,10 @@
-const { addExpense, addExpenseDetails } = require("../../services/expense/expenseService");
+const { default: mongoose } = require("mongoose");
+const { addExpense, addExpenseDetails, getUserBalance, getExpense } = require("../../services/expense/expenseService");
 const { updateGroup } = require("../../services/group/groupService");
 const { getFriendsListByUserId } = require("../../services/user/friendsService");
 const { getUserDetailsById } = require("../../services/user/userService");
+const { Friends, ExpenseDetail, Expense } = require("../../models");
+const { SPLIT_TYPE } = require("../../utils/enums");
 
 class ExpenseController {
     static async addExpense(req, res) {
@@ -17,12 +20,12 @@ class ExpenseController {
                     let expense = await addExpense(payload);
                     expense.save();
                     if (expense) {
-
                         let expenseDetailPayload = payload.shares?.map(share => {
                             return {
                                 expenseId: expense._id,
-                                paidFor: share.paidFor,
-                                amount: share.amount,
+                                paidBy: expense.paidBy,
+                                paidFor: new mongoose.Types.ObjectId(share.paidFor),
+                                amount: parseFloat(share.amount.toFixed(2)),
                                 splitType: share.splitType
                             };
                         });
@@ -31,15 +34,39 @@ class ExpenseController {
                         if (expenseDetails) {
                             let paidByUser = await getFriendsListByUserId(paidBy);
                             expenseDetailPayload.forEach(async (share) => {
-                                if (share.paidFor != paidBy) {
-                                    let friend1 = paidByUser.friends.find(f => f.user._id.toString() == share.paidFor);
+                                if (share.paidFor.toString() != paidBy) {
+                                    let friend1 = {};
+                                    if (paidByUser && paidByUser.friends && paidByUser.friends.length > 0) {
+                                        friend1 = paidByUser.friends.find(f => f.user._id.toString() == share.paidFor.toString());
+                                        if (friend1 == undefined) {
+                                            paidByUser.friends = [...paidByUser.friends, { user: share.paidFor, amount: 0 }]
+                                        }
+                                    } else {
+                                        paidByUser = new Friends();
+                                        paidByUser.user = new mongoose.Types.ObjectId(paidBy);
+                                        paidByUser.friends = [{ user: share.paidFor, amount: 0 }]
+                                    }
+
+                                    friend1 = paidByUser.friends.find(f => f.user._id.toString() == share.paidFor.toString());
                                     friend1.amount = friend1.amount + share.amount;
-                                    let paidForUser = await getFriendsListByUserId(share.paidFor);
-                                    let friend2 = paidForUser.friends.find(f => f.user._id.toString() == paidBy);
+
+                                    let paidForUser = await getFriendsListByUserId(share.paidFor.toString());
+                                    if (paidForUser && paidForUser.friends && paidForUser.friends.length > 0) {
+                                        friend1 = paidForUser.friends.find(f => f.user._id.toString() == share.paidBy.toString());
+                                        if (friend1 == undefined) {
+                                            paidForUser.friends = [...paidForUser.friends, { user: share.paidBy, amount: 0 }]
+                                        }
+                                    } else {
+                                        paidForUser = new Friends();
+                                        paidForUser.user = share.paidFor;
+                                        paidForUser.friends = [{ user: share.paidBy, amount: 0 }]
+                                    }
+
+                                    let friend2 = paidForUser.friends.find(f => f.user._id.toString() == share.paidBy.toString());
                                     friend2.amount = friend2.amount - share.amount;
                                     paidForUser.save();
                                 }
-                                
+
                             })
                             paidByUser.save();
                         }
@@ -94,7 +121,8 @@ class ExpenseController {
                         let expenseDetailPayload = payload.shares?.map(share => {
                             return {
                                 expenseId: expense._id,
-                                paidFor: share.paidFor,
+                                paidBy: expense.paidBy,
+                                paidFor: new mongoose.Types.ObjectId(share.paidFor),
                                 amount: share.amount,
                                 splitType: share.splitType
                             };
@@ -103,27 +131,52 @@ class ExpenseController {
                         let expenseDetails = await addExpenseDetails(expenseDetailPayload);
                         if (expenseDetails) {
                             let paidByUser = await getFriendsListByUserId(paidBy);
-                            let paidByGroupUser = groupDetail.groupMembers.find(member => member.user._id.toString() == paidBy);
+                            //let paidByGroupUser = groupDetail.groupMembers.find(member => member.user._id.toString() == paidBy);
                             for (let i = 0; i < expenseDetailPayload.length; i++) {
                                 const share = expenseDetailPayload[i];
 
                                 //Skip payer's own expense record.
-                                if (share.paidFor == paidBy) {
+                                if (share.paidFor.toString() == paidBy) {
                                     continue;
                                 }
 
-                                let friend1 = paidByUser.friends.find(f => f.user._id.toString() == share.paidFor);
+                                let friend1 = paidByUser.friends.find(f => f.user._id.toString() == share.paidFor.toString());
                                 friend1.amount = friend1.amount + share.amount;
 
-                                paidByGroupUser.amount = paidByGroupUser.amount + share.amount;
+                                if (friend1.groups && friend1.groups.length > 0) {
+                                    let group1 = friend1.groups.find(g => g.groupId.toString() == groupId);
+                                    if (group1 == null) {
+                                        group1.amount = group1.amount + share.amount;
+                                    } else {
+                                        friend1.groups = [...friend1.groups, { groupId: new mongoose.Types.ObjectId(groupId), amount: share.amount }]
+                                    }
+
+                                } else {
+                                    friend1.groups = [{ groupId: new mongoose.Types.ObjectId(groupId), amount: share.amount }]
+                                }
+
+
+                                //paidByGroupUser.amount = paidByGroupUser.amount + share.amount;
 
 
                                 let paidForUser = await getFriendsListByUserId(share.paidFor);
                                 let friend2 = paidForUser.friends.find(f => f.user._id.toString() == paidBy);
                                 friend2.amount = friend2.amount - share.amount;
 
-                                let paidForGroupUser = groupDetail.groupMembers.find(member => member.user._id.toString() == share.paidFor);
-                                paidForGroupUser.amount = paidForGroupUser.amount - share.amount;
+                                if (friend2.groups && friend2.groups.length > 0) {
+                                    let group2 = friend2.groups.find(g => g.groupId.toString() == groupId);
+                                    if (group2 == null) {
+                                        group2.amount = group2.amount - share.amount;
+                                    } else {
+                                        friend2.groups = [...friend2.groups, { groupId: new mongoose.Types.ObjectId(groupId), amount: -1 * share.amount }]
+                                    }
+
+                                } else {
+                                    friend2.groups = [{ groupId: new mongoose.Types.ObjectId(groupId), amount: -1 * share.amount }]
+                                }
+
+                                //let paidForGroupUser = groupDetail.groupMembers.find(member => member.user._id.toString() == share.paidFor);
+                                //paidForGroupUser.amount = paidForGroupUser.amount - share.amount;
 
                                 paidForUser.save();
                             }
@@ -144,6 +197,220 @@ class ExpenseController {
                     }
                 }
             }
+        } catch (error) {
+            return res.status(500).json({
+                type: "error",
+                message: error.message || "Unhandled Error",
+                error,
+            });
+        }
+    }
+
+    static async fetchUserExpense(req, res) {
+        try {
+            const userId = req.params.id;
+            const friendId = req.params.friendId;
+            let expenses = await getUserBalance(userId);
+            let ids = new Set()
+
+            expenses.filter(expense => {
+                return ((expense.paidFor._id.toString() == friendId) && expense.expenseId.paidBy._id.toString() == userId)
+                    || (expense.paidFor._id.toString() == userId && expense.expenseId.paidBy._id.toString() == friendId)
+            }).map(expense => ids.add(expense.expenseId._id));
+
+            expenses = expenses.filter(expense => ids.has(expense.expenseId._id));
+
+            let expenseDetails = [];
+            expenses.forEach(expense => {
+                let e = expenseDetails.findIndex(detail => detail.expenseSummary._id == expense.expenseId._id);
+                if (e >= 0) {
+                    expenseDetails = expenseDetails.map(detail => {
+                        if (detail.expenseSummary._id == expense.expenseId._id) {
+                            let arr = detail.expenseDetail;
+                            arr = [...arr, expense]
+                            detail = { ...detail, expenseDetail: arr }
+                        }
+                        return detail;
+                    });
+                } else {
+                    let d = {
+                        expenseSummary: expense.expenseId,
+                        expenseDetail: [expense]
+                    }
+                    expenseDetails.push(d);
+                }
+            })
+
+            if (expenses) {
+                return res.status(200).json({
+                    type: "success",
+                    message: "Success result",
+                    data: expenseDetails,
+                });
+            } else {
+                return res.status(200).json({
+                    type: "success",
+                    message: "No expenses found",
+                    data: null,
+                });
+            }
+        } catch (error) {
+            return res.status(500).json({
+                type: "error",
+                message: error.message || "Unhandled Error",
+                error,
+            });
+        }
+    }
+
+    static async settleExpense(req, res) {
+        try {
+            const { payerId, creditorId, amount, expenseName, expenseDate } = req.body;
+
+            let settleExpense = new Expense();
+            settleExpense.paidBy = new mongoose.Types.ObjectId(payerId);
+            settleExpense.expenseAmount = amount;
+            settleExpense.expenseName = expenseName;
+            settleExpense.groupId = undefined;
+            settleExpense.expenseDate = new Date(expenseDate).toISOString();
+            settleExpense.save();
+
+            let settleExpenseDetail = new ExpenseDetail();
+            settleExpenseDetail.expenseId = settleExpense._id;
+            settleExpenseDetail.paidBy = new mongoose.Types.ObjectId(payerId);
+            settleExpenseDetail.paidFor = new mongoose.Types.ObjectId(creditorId);
+            settleExpenseDetail.splitType = SPLIT_TYPE.SETTLED;
+            settleExpenseDetail.amount = amount;
+            settleExpenseDetail.save();
+
+            let payer = await getFriendsListByUserId(payerId);
+            if (payer && payer.friends && payer.friends.length > 0) {
+                let friend1 = payer.friends.find(f => f.user._id.toString() == creditorId);
+                if (friend1 != undefined) {
+                    friend1.amount = friend1.amount + amount;
+                    payer.save();
+                } else {
+                    return res.status(500).json({
+                        type: "fail",
+                        message: "Something went wrong while settling amount.",
+                        data: null,
+                    });
+                }
+            } else {
+                return res.status(500).json({
+                    type: "fail",
+                    message: "Something went wrong while settling amount.",
+                    data: null,
+                });
+            }
+
+            let creditor = await getFriendsListByUserId(creditorId);
+            if (creditor && creditor.friends && creditor.friends.length > 0) {
+                let friend1 = creditor.friends.find(f => f.user._id.toString() == payerId);
+                if (friend1 != undefined) {
+                    friend1.amount = friend1.amount - amount;
+                    creditor.save();
+                } else {
+                    return res.status(500).json({
+                        type: "fail",
+                        message: "Something went wrong while settling amount.",
+                        data: null,
+                    });
+                }
+            } else {
+                return res.status(500).json({
+                    type: "fail",
+                    message: "Something went wrong while settling amount.",
+                    data: null,
+                });
+            }
+
+            return res.status(200).json({
+                type: "success",
+                message: "Expense settled up.",
+                data: null,
+            });
+        } catch (error) {
+            return res.status(500).json({
+                type: "error",
+                message: error.message || "Unhandled Error",
+                error,
+            });
+        }
+    }
+
+    static async settleGroupExpense(req, res) {
+        try {
+            const { payerId, creditorId, amount, groupId, expenseName, expenseDate } = req.body;
+
+            let settleExpense = new Expense();
+            settleExpense.paidBy = new mongoose.Types.ObjectId(payerId);
+            settleExpense.expenseAmount = amount;
+            settleExpense.expenseName = expenseName;
+            settleExpense.groupId = groupId;
+            settleExpense.expenseDate = new Date(expenseDate).toISOString();
+            settleExpense = settleExpense.save();
+
+            let settleExpenseDetail = new ExpenseDetail();
+            settleExpenseDetail.expenseId = settleExpense._id;
+            settleExpenseDetail.groupId = groupId;
+            settleExpenseDetail.paidBy = new mongoose.Types.ObjectId(payerId);
+            settleExpenseDetail.paidFor = new mongoose.Types.ObjectId(creditor);
+            settleExpenseDetail.splitType = SPLIT_TYPE.SETTLED;
+            settleExpenseDetail.amount = amount;
+            settleExpenseDetail.save();
+
+            let payer = await getFriendsListByUserId(payerId);
+            if (creditorcreditor && creditor.friends && creditor.friends.length > 0) {
+                let friend1 = creditor.friends.find(f => f.user._id.toString() == creditorId);
+                let group1 = friend1.groups.find(g => g.groupId.toString() == groupId);
+                if (friend1 != undefined && group1) {
+                    friend1.amount = friend1.amount + amount;
+                    group1.amount = group1.amount + amount;
+                    payer.save();
+                } else {
+                    return res.status(500).json({
+                        type: "fail",
+                        message: "Something went wrong while settling amount.",
+                        data: null,
+                    });
+                }
+            } else {
+                return res.status(500).json({
+                    type: "fail",
+                    message: "Something went wrong while settling amount.",
+                    data: null,
+                });
+            }
+
+            let creditor = await getFriendsListByUserId(creditorId);
+            if (creditor && creditor.friends && creditor.friends.length > 0) {
+                let friend1 = creditor.friends.find(f => f.user._id.toString() == payerId);
+                let group2 = friend1.groups.find(g => g.groupId.toString() == groupId);
+                if (friend1 && group2) {
+                    friend1.amount = friend1.amount - amount;
+                    group2.amount = group2.amount - amount;
+                    creditor.save();
+                } else {
+                    return res.status(500).json({
+                        type: "fail",
+                        message: "Something went wrong while settling amount.",
+                        data: null,
+                    });
+                }
+            } else {
+                return res.status(500).json({
+                    type: "fail",
+                    message: "Something went wrong while settling amount.",
+                    data: null,
+                });
+            }
+
+            return res.status(200).json({
+                type: "success",
+                message: "Expense settled up.",
+                data: null,
+            });
         } catch (error) {
             return res.status(500).json({
                 type: "error",

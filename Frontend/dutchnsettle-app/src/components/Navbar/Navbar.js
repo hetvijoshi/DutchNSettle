@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Container, Typography, Box, IconButton, Menu, MenuItem, Tooltip, Avatar, Grid, Button } from "@mui/material";
+import { Container, Typography, Box, IconButton, Menu, MenuItem, Tooltip, Avatar, Grid, Button, linkClasses } from "@mui/material";
 import classes from "./Navbar.module.scss";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -19,7 +19,9 @@ export const Navbar = () => {
 
     const handleCloseUserMenu = (link) => {
         setAnchorElUser(null);
-        router.push(link);
+        if (link && link.length > 0) {
+            router.push(link);
+        }
     };
     return (
         <nav className={classes.navbar}>
