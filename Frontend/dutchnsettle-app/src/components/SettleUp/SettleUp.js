@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { Dialog, DialogContent, DialogTitle, Box, Avatar, Grid, TextField, Button } from "@mui/material"
+import { Dialog, DialogContent, DialogTitle, Box, Avatar, Grid, TextField, Button, DialogActions, Typography } from "@mui/material"
 import PaidIcon from "@mui/icons-material/Paid";
 import EastIcon from "@mui/icons-material/East";
 import { useSession } from "next-auth/react";
@@ -32,31 +32,30 @@ export const SettleUp = ({ friend, open, close, setAlert }) => {
             <Dialog onClose={close} open={open} maxWidth={"sm"} sx={{ minWidth: "1000px" }} fullWidth>
                 <DialogTitle>Settle Up</DialogTitle>
                 <DialogContent>
-                    <Box alignItems={"center"}>
-                        <Grid container display={"flex"} alignItems={"center"} >
-                            <Grid item xs={3}>{friend.amount < 0 ? (<Avatar src={session.user["image"]} />) : (<Avatar src={friend.user.picture} />)}</Grid>
-                            <Grid item xs={3}><PaidIcon /><EastIcon /></Grid>
-                            <Grid item xs={5}>{friend.amount < 0 ? (<Avatar src={friend.user.picture} />) : (<Avatar src={session.user["image"]} />)}</Grid>
+                    <Box textAlign={"center"}>
+                        <Grid container display={"flex"} justifyContent={"center"} alignItems={"center"} gap={3} my={3}>
+                            <Grid item>{friend.amount < 0 ? (<Avatar sx={{ width: 70, height: 70 }} src={session.user["image"]} />) : (<Avatar sx={{ width: 70, height: 70 }} src={friend.user.picture} />)}</Grid>
+                            <Grid item><PaidIcon sx={{ fontSize: 40 }} /><EastIcon sx={{ fontSize: 40 }} /></Grid>
+                            <Grid item>{friend.amount < 0 ? (<Avatar sx={{ width: 70, height: 70 }} src={friend.user.picture} />) : (<Avatar sx={{ width: 70, height: 70 }} src={session.user["image"]} />)}</Grid>
                         </Grid>
-                        <Grid container display={"flex"} alignItems={"center"} >
-                            <Grid item>{friend.amount < 0 ? `You paid ${friend.user.name}` : `${friend.user.name} paid you`}</Grid>
-                        </Grid>
-                        <Grid container display={"flex"} alignItems={"center"} >
-                            <Grid item><TextField type={"number"} autoFocus
+                        <Box display={"flex"} justifyContent={"center"} mt={3}>
+                            <Typography>{friend.amount < 0 ? `You paid ${friend.user.name}` : `${friend.user.name} paid you`}</Typography>
+                        </Box>
+                        <Box display={"flex"} justifyContent={"center"}>
+                            <TextField inputProps={{ style: { textAlign: "center" } }} type={"number"} autoFocus
                                 margin="dense"
                                 id="name"
-                                fullWidth
+                                // fullWidth
                                 variant="standard"
                                 disabled
-                                defaultValue={friend.amount < 0 ? -1 * friend.amount : friend.amount} /></Grid>
-                        </Grid>
-                        <Grid container display={"flex"} alignItems={"center"} >
-                            <Grid item>
-                                <Button onClick={settleAmount}>Save</Button>
-                            </Grid>
-                        </Grid>
+                                defaultValue={friend.amount < 0 ? -1 * friend.amount : friend.amount} />
+                        </Box>
                     </Box>
                 </DialogContent>
+                <DialogActions>
+                    <Button onClick={close}>Cancel</Button>
+                    <Button onClick={settleAmount}>Save</Button>
+                </DialogActions>
             </Dialog>
         </>
 

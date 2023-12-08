@@ -1,5 +1,5 @@
 "use client"
-import { Avatar, Container, Paper, Grid, Box, Button, Typography, Divider, List, ListItemButton, Collapse, Card, CardContent, Alert, AlertTitle } from "@mui/material"
+import { Avatar, Container, Paper, Grid, Box, Button, Typography, Divider, List, ListItemButton, Collapse, Card, Alert, AlertTitle } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import classes from "./group.module.scss"
 import { useSession } from "next-auth/react"
@@ -164,27 +164,26 @@ const Group = ({ params }) => {
                         <Grid item>
                             <Box gap={2}>
                                 <Button onClick={clickOpenAddExpense}>Add an expense</Button>
-                                <Button>Settle up</Button>
                             </Box>
                         </Grid>
                     </Grid>
                     <Divider sx={{ marginY: "10px" }} />
                     <Grid>
                         {friends && friends.length > 0 && friends.map((friendDetail, index) => (
-                            <Card key={{ index }} sx={{ minWidth: 180, padding: 1, margin: 1 }}>
-                                <CardContent sx={{ padding: 0 }}>
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                        <Typography sx={{ fontSize: 18 }} color={colors.black} gutterBottom>
-                                            {friendDetail.user.name}
-                                        </Typography>
-                                        <Typography sx={{ fontSize: 18 }} color={friendDetail.amount < 0 ? colors.dangerDefault : colors.successDefault} gutterBottom>
+                            <Card key={{ index }} sx={{ minWidth: 180, padding: 2, margin: 2 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <Typography sx={{ fontSize: 18, margin: 0 }} color={colors.black} gutterBottom>
+                                        {friendDetail.user.name}
+                                    </Typography>
+                                    <Box gap={2} display={"flex"} alignItems={"center"}>
+                                        <Typography sx={{ fontSize: 18, margin: 0 }} color={friendDetail.amount < 0 ? colors.dangerDefault : colors.successDefault} gutterBottom>
                                             {"$" + friendDetail.amount}
                                         </Typography>
-                                    </div>
-                                </CardContent>
-                                <Button sx={{ padding: 0 }} onClick={() => handleSettleFriend(friendDetail)}>
-                                    {`Settle Up $${friendDetail.amount}`}
-                                </Button>
+                                        <Button sx={{ padding: 0 }} onClick={() => handleSettleFriend(friendDetail)}>
+                                            {"Settle Up"}
+                                        </Button>
+                                    </Box>
+                                </div>
                             </Card >
                         ))}
                         {openSettleUp && (<SettleUp friend={settleUpFriend} open={openSettleUp} close={closeSettleUpDialog} setAlert={setAlert} />)}
@@ -206,7 +205,11 @@ const Group = ({ params }) => {
                                             <div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You paid " : expense.expenseSummary.paidBy.firstName + " paid"} <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>${expense.expenseSummary.expenseAmount}</span></div>
                                         </Grid>
                                         <Grid item xs={3}>
-                                            <div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You lent " : "You owe "} <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>${expense.expenseSummary.paidBy._id == session.user["userId"] ? expense.expenseSummary.expenseAmount - expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"]).amount : expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"]).amount}</span></div>
+                                            <div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You lent " : "You owe "}
+                                                <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>
+                                                    ${expense.expenseSummary.paidBy._id == session.user["userId"] ? expense.expenseSummary.expenseAmount - expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"])?.amount : expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"])?.amount}
+                                                </span>
+                                            </div>
                                         </Grid>
                                     </Grid>
                                     {expandIndex == (index + 1) ? <ExpandLess /> : <ExpandMore />}
@@ -241,11 +244,12 @@ const Group = ({ params }) => {
                         </>
                     )}
                 </Paper>
-            </Container>
+            </Container >
             {openAddExpense &&
                 <ExpenseContext.Provider value={expenseValue}>
                     <AddExpenseDialog open={openAddExpense} handleClose={closeAddExpense} />
-                </ExpenseContext.Provider>}
+                </ExpenseContext.Provider>
+            }
         </>
     )
 }

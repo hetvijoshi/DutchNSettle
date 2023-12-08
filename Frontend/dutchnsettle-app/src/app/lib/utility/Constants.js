@@ -1,0 +1,1 @@
+export const FRONTEND_URL = "https://frontend-dot-dutchnsettle-402123.uk.r.appspot.com"
