@@ -10,7 +10,7 @@ import classes from "./GroupCustomCard.module.scss";
 
 export const GroupCustomCard = ({ groupDetail }) => {
     return (
-        <Card sx={{ minWidth: 180, padding: 1, margin: 1}}>
+        <Card sx={{ minWidth: 180, padding: 1, margin: 1 }}>
             <CardContent sx={{ padding: 0 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <Typography sx={{ fontSize: 18 }} color={colors.black} gutterBottom>
@@ -22,7 +22,7 @@ export const GroupCustomCard = ({ groupDetail }) => {
                 </div>
             </CardContent>
             <CardActions sx={{ padding: 0 }}>
-                <Link href="/" className={classes.link_style}>View details</Link>
+                <Link href={`/group/${groupDetail._id}`} className={classes.link_style}>View details</Link>
             </CardActions>
         </Card >
     );

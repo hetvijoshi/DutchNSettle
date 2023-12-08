@@ -27,6 +27,8 @@ export default function AutoComplete({ handleChange, errors }) {
     return (
         <Box gap={2} sx={{ width: 300 }}>
             {expense.results?.length >= 0 && <Autocomplete
+                disabled={expense.isGroup ? true : false}
+                defaultValue={expense.isGroup ? [{ name: expense.groupName }] : []}
                 multiple
                 id="tags-standard"
                 options={expense.results}
@@ -42,7 +44,7 @@ export default function AutoComplete({ handleChange, errors }) {
                 renderTags={(tagValue, getTagProps) => {
                     tagValue = [...new Map(tagValue.map(item => [item._id, item])).values()]
                     return tagValue.map((option, index) => {
-                        return (<Chip {...getTagProps({ index })} key={option._id} label={option.name} />)
+                        return (<Chip {...getTagProps({ index })} key={index} label={option.name} />)
                     })
                 }}
 

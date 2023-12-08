@@ -11,10 +11,9 @@ import { FaEquals } from "react-icons/fa";
 import { FaPercentage } from "react-icons/fa";
 import { FaChartBar } from "react-icons/fa6";
 import { colors } from "@/styles/colors";
+import dayjs from "dayjs";
 
 const Dashboard = () => {
-
-
     const splitOptions = [
         {
             name: "Split equally",
@@ -45,7 +44,7 @@ const Dashboard = () => {
     const [friends, setFriends] = useState([]);
     const [groups, setGroups] = useState([]);
     const [expense, setExpense] = useState({
-        results: [], description: "", amount: "", members: [], paidBy: "", loggedInMember: {}, openSplitScreen: false, selectedOption: splitOptions[0], splitOptions: splitOptions
+        results: [], description: "", amount: "", expenseDate: dayjs(new Date()), members: [], paidBy: "", loggedInMember: {}, openSplitScreen: false, selectedOption: splitOptions[0], splitOptions: splitOptions, isGroup: false
     });
 
     const { data: session } = useSession();
@@ -89,7 +88,7 @@ const Dashboard = () => {
         const loggedInMember = { ...session.user };
         loggedInMember["picture"] = session?.user?.image
         loggedInMember["_id"] = session?.user["userId"]
-        setExpense({ results: [], description: "", amount: "", members: [loggedInMember], loggedInMember: loggedInMember, openSplitScreen: false, selectedOption: splitOptions[0], splitOptions: splitOptions })
+        setExpense({ results: [], description: "", amount: "", expenseDate: dayjs(new Date()), members: [loggedInMember], paidBy: loggedInMember._id, loggedInMember: loggedInMember, openSplitScreen: false, selectedOption: splitOptions[0], splitOptions: splitOptions })
     }
 
     const clickOpenAddExpense = () => {
