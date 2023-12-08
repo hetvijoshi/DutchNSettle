@@ -3,9 +3,9 @@ import { Dialog, DialogContent, DialogTitle, Box, Avatar, Grid, TextField, Butto
 import PaidIcon from "@mui/icons-material/Paid";
 import EastIcon from "@mui/icons-material/East";
 import { useSession } from "next-auth/react";
-import { settleExpenseAmount } from "@/app/services/ExpenseService";
+import { settleExpenseAmount, settleGroupExpenseAmount } from "@/app/services/ExpenseService";
 
-export const SettleUp = ({ friend, open, close, setAlert }) => {
+export const SettleUp = ({ friend, open, close, setAlert, groupId }) => {
 
     const { data: session } = useSession();
 
@@ -18,8 +18,14 @@ export const SettleUp = ({ friend, open, close, setAlert }) => {
             creditorId: friend.amount < 0 ? friend.user._id : session.user["userId"]
         };
         const token = session["id_token"]
-        let response = await settleExpenseAmount(payload, token);
-        setAlert({ type: response.type, message: response.message || "" });
+        if (groupId) {
+            payload["groupId"] = groupId;
+            let response = await settleGroupExpenseAmount(payload, token);
+            setAlert({ type: response.type, message: response.message || "" });
+        } else {
+            let response = await settleExpenseAmount(payload, token);
+            setAlert({ type: response.type, message: response.message || "" });
+        }
         close();
     }
 

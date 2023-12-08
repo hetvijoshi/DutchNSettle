@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material"
+import {  Autocomplete, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material"
 import React, { useContext, useState } from "react"
 import { useSession } from "next-auth/react";
 import { getFriends, getSearchResults } from "@/app/services/FriendsService";
@@ -12,11 +12,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 
-const AddExpenseDialog = ({ open, handleClose }) => {
+const AddExpenseDialog = ({ open, handleClose, setAlert }) => {
     const { expense, setExpense } = useContext(ExpenseContext)
     const [errors, setErrors] = useState({ description: "", amount: "", membersInvolved: "", membersShareSum: "" });
     const { setFriends } = useContext(FriendsContext);
-    const defaultProps = {
+        const defaultProps = {
         options: expense.members,
         getOptionLabel: (option) => option.name,
     };
@@ -126,7 +126,7 @@ const AddExpenseDialog = ({ open, handleClose }) => {
         const token = session["id_token"]
         const addExpense = await addIndividualExpense(payload, token)
         if (addExpense) {
-            alert(addExpense.message)
+            setAlert({ type: addExpense.type, message: addExpense.message })
             if (addExpense.type == "success") {
                 fetchAllFriends()
             }
@@ -168,10 +168,10 @@ const AddExpenseDialog = ({ open, handleClose }) => {
         const token = session["id_token"]
         const addExpense = await addGroupExpense(payload, token)
         if (addExpense?.type == "success") {
-            alert("Group Expense created successfully")
+            setAlert({ type: addExpense.type, message: "Group Expense added successfully" })
         }
         else {
-            alert("Something went wrong")
+            setAlert({ type: "error", message: "Something went wrong." })
         }
         handleClose()
     }
