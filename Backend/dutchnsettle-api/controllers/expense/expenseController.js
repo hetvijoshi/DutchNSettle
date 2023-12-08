@@ -123,7 +123,7 @@ class ExpenseController {
                                 expenseId: expense._id,
                                 paidBy: expense.paidBy,
                                 paidFor: new mongoose.Types.ObjectId(share.paidFor),
-                                amount: share.amount,
+                                amount: parseFloat(share.amount.toFixed(2)),
                                 splitType: share.splitType
                             };
                         });
@@ -145,7 +145,7 @@ class ExpenseController {
 
                                 if (friend1.groups && friend1.groups.length > 0) {
                                     let group1 = friend1.groups.find(g => g.groupId.toString() == groupId);
-                                    if (group1 == null) {
+                                    if (group1 != null) {
                                         group1.amount = group1.amount + share.amount;
                                     } else {
                                         friend1.groups = [...friend1.groups, { groupId: new mongoose.Types.ObjectId(groupId), amount: share.amount }]
@@ -165,7 +165,7 @@ class ExpenseController {
 
                                 if (friend2.groups && friend2.groups.length > 0) {
                                     let group2 = friend2.groups.find(g => g.groupId.toString() == groupId);
-                                    if (group2 == null) {
+                                    if (group2 != null) {
                                         group2.amount = group2.amount - share.amount;
                                     } else {
                                         friend2.groups = [...friend2.groups, { groupId: new mongoose.Types.ObjectId(groupId), amount: -1 * share.amount }]
