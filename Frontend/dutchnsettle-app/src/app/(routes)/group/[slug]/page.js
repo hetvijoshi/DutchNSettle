@@ -1,5 +1,5 @@
 "use client"
-import { Avatar, Container, Paper, Grid, Box, Button, Typography, Divider, List, ListItemButton, Collapse, } from "@mui/material"
+import { Avatar, Container, Paper, Grid, Box, Button, Typography, Divider, List, ListItemButton, Collapse, Card, CardContent, Alert, AlertTitle } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import classes from "./group.module.scss"
 import { useSession } from "next-auth/react"
@@ -14,7 +14,9 @@ import { FaChartBar } from "react-icons/fa6";
 import dayjs from "dayjs"
 import { getFriends } from "@/app/services/FriendsService";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
-
+import { colors } from "@/styles/colors";
+import { getGroupExpenseDetails } from "@/app/services/ExpenseService";
+import { SettleUp } from "../../../../components/SettleUp/SettleUp";
 
 const Group = ({ params }) => {
     const splitOptions = [
@@ -52,6 +54,10 @@ const Group = ({ params }) => {
     const [friends, setFriends] = useState();
     const [expenseDetails, setExpenseDetails] = useState([]);
     const [expandIndex, setExpandIndex] = useState(0);
+    const [openSettleUp, setSettleUp] = useState(false);
+    const [settleUpFriend, setSettleUpFriend] = useState({});
+    const [alert, setAlert] = useState({ type: "", message: "" });
+    const [openAddExpense, setOpenAddExpense] = React.useState(false);
 
     const fetchGroupDetail = async () => {
         const fetchGroupDetails = await getGroupDetail(params.slug, session["id_token"])
@@ -63,15 +69,22 @@ const Group = ({ params }) => {
         const userId = session.user["userId"]
         const response = await getFriends(userId, token)
         const friendList = response.data.friends ? response.data.friends : [];
-        const friendData = friendList.filter(x => x.user._id == params.slug)
-        setFriends(friendData);
+        let friends = [];
+        friendList.map(f => {
+            let g = f.groups.find(g => g.groupId == params.slug);
+            if (g != undefined) {
+                friends.push({ user: f.user, amount: g.amount });
+            }
+        });
+        console.log(params.slug, friendList, friends);
+        setFriends(friends);
     }
 
     const fetchAllExpense = async (groupId) => {
-        // const token = session["id_token"];
-        // const response = await getGroupExpenseDetails({ groupId }, token)
-        // const expenseData = response.data ? response.data : {};
-        // setExpenseDetails(expenseData);
+        const token = session["id_token"];
+        const response = await getGroupExpenseDetails(groupId, token)
+        const expenseData = response.data ? response.data : {};
+        setExpenseDetails(expenseData);
     }
 
     const fetchPageData = () => {
@@ -84,16 +97,9 @@ const Group = ({ params }) => {
         fetchPageData()
     }, [params.slug])
 
-    // useEffect(() => {
-    //     const loggedInMember = { ...session.user };
-    //     loggedInMember["picture"] = session?.user?.image
-    //     loggedInMember["_id"] = session?.user["userId"]
-    //     expense.loggedInMember = loggedInMember
-
-    //     setExpense({ ...expense, members: uniqueMembers })
-    // }, [])
-
-    const [openAddExpense, setOpenAddExpense] = React.useState(false);
+    const handleAlertClose = () => {
+        setAlert({ type: "", message: "" });
+    }
 
     const resetExpenseContext = () => {
         console.log("hi")
@@ -126,8 +132,24 @@ const Group = ({ params }) => {
         }
     }
 
+    const handleSettleFriend = (friendDetail) => {
+        setSettleUpFriend(friendDetail);
+        setSettleUp(true);
+    }
+
+    const closeSettleUpDialog = () => {
+        setSettleUpFriend({});
+        setSettleUp(false);
+    }
+
     return (
         <>
+            {alert && alert.type.length > 0 && alert.message.length > 0 &&
+                <Alert severity={alert.type} onClose={() => { handleAlertClose() }}>
+                    <AlertTitle>{alert.type.toUpperCase()}</AlertTitle>
+                    {alert.message}
+                </Alert>
+            }
             <Container padding={3}>
                 <Paper elevation={2} className={classes.center_paper}>
                     <Link href="/dashboard" style={{ textDecoration: "none" }}>{"< Back"}</Link>
@@ -147,6 +169,28 @@ const Group = ({ params }) => {
                         </Grid>
                     </Grid>
                     <Divider sx={{ marginY: "10px" }} />
+                    <Grid>
+                        {friends && friends.length > 0 && friends.map((friendDetail, index) => (
+                            <Card key={{ index }} sx={{ minWidth: 180, padding: 1, margin: 1 }}>
+                                <CardContent sx={{ padding: 0 }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                        <Typography sx={{ fontSize: 18 }} color={colors.black} gutterBottom>
+                                            {friendDetail.user.name}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: 18 }} color={friendDetail.amount < 0 ? colors.dangerDefault : colors.successDefault} gutterBottom>
+                                            {"$" + friendDetail.amount}
+                                        </Typography>
+                                    </div>
+                                </CardContent>
+                                <Button sx={{ padding: 0 }} onClick={() => handleSettleFriend(friendDetail)}>
+                                    {`Settle Up $${friendDetail.amount}`}
+                                </Button>
+                            </Card >
+                        ))}
+                        {openSettleUp && (<SettleUp friend={settleUpFriend} open={openSettleUp} close={closeSettleUpDialog} setAlert={setAlert} />)}
+                    </Grid>
+
+                    <Divider sx={{ marginY: "10px" }} />
                     {expenseDetails && expenseDetails.length > 0 && (
                         expenseDetails.map((expense, index) => (
                             <>
@@ -162,7 +206,7 @@ const Group = ({ params }) => {
                                             <div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You paid " : expense.expenseSummary.paidBy.firstName + " paid"} <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>${expense.expenseSummary.expenseAmount}</span></div>
                                         </Grid>
                                         <Grid item xs={3}>
-                                            <div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You lent " : "You owe "} <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>${expense.expenseSummary.paidBy._id == session.user["userId"] ? expense.expenseDetail.find(expense => expense.paidFor._id == params.slug).amount : expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"]).amount}</span></div>
+                                            <div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You lent " : "You owe "} <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>${expense.expenseSummary.paidBy._id == session.user["userId"] ? expense.expenseSummary.expenseAmount - expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"]).amount : expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"]).amount}</span></div>
                                         </Grid>
                                     </Grid>
                                     {expandIndex == (index + 1) ? <ExpandLess /> : <ExpandMore />}
@@ -190,7 +234,7 @@ const Group = ({ params }) => {
                     )}
                     {expenseDetails && expenseDetails.length == 0 && (
                         <>
-                            
+
                             <Container sx={{ marginTop: 5 }}>
                                 No expenses yet.
                             </Container>
