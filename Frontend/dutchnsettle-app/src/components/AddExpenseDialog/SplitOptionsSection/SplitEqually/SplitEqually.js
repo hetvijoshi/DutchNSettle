@@ -11,7 +11,7 @@ const SplitEqually = () => {
         const totalChecked = expense.members.filter(m => { return m.checked }).length;
         const shareMembers = expense.members.map(member => {
             if (member.checked) {
-                return { ...member, share: expense.amount / totalChecked }
+                return { ...member, share:  parseFloat((expense.amount / totalChecked).toFixed(2)) }
             } else {
                 return { ...member }
             }
@@ -22,6 +22,7 @@ const SplitEqually = () => {
     const handleChange = (event) => {
         const filteredSplitMembers = expense?.members?.map(member => {
             if (member._id == event.target.name) {
+                
                 member["checked"] = !member.checked
                 member["share"] = ""
                 return { ...member }
@@ -33,11 +34,12 @@ const SplitEqually = () => {
         const totalChecked = filteredSplitMembers.filter(m => { return m.checked }).length;
         const shareMembers = filteredSplitMembers.map(member => {
             if (member.checked) {
-                return { ...member, share: expense.amount / totalChecked }
+                return { ...member, share: parseFloat((expense.amount / totalChecked).toFixed(2)) }
             } else {
-                return { ...member }
+                return { ...member, share: "" }
             }
         })
+        console.log(shareMembers)
         setExpense({ ...expense, members: shareMembers })
     };
 

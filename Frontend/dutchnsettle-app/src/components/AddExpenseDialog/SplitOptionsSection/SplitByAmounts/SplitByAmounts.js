@@ -13,11 +13,12 @@ const SplitByAmounts = () => {
         const totalChecked = expense.members.filter(m => { return m.checked }).length;
         const shareMembers = expense.members.map(member => {
             if (member.checked) {
-                return { ...member, share: expense.amount / totalChecked }
+                return { ...member, share: parseFloat((expense.amount / totalChecked).toFixed(2)) }
             } else {
                 return { ...member }
             }
         })
+        console.log(shareMembers)
         setExpense({ ...expense, members: shareMembers })
     }, [expense.amount])
 

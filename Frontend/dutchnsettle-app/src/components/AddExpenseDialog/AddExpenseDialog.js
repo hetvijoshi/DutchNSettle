@@ -96,21 +96,30 @@ const AddExpenseDialog = ({ open, handleClose, setAlert }) => {
 
         let memberShares = []
         if (expense.selectedOption.splitType == "BY_EQUALLY" || expense.selectedOption.splitType == "BY_AMOUNTS") {
-            memberShares = expense.members.map(member => {
-                const expenseAmount = member.share == undefined || !member.share ? expense.amount / expense.members.length : Number(member.share)
-                return { paidFor: member._id, amount: expenseAmount, splitType: expense.selectedOption.splitType }
+            expense.members.map(member => {
+                let expenseAmount = 0;
+                if (member.share == undefined || !member.share) {
+                    const totalChecked = expense.members.filter(m => { return m.checked }).length;
+                    if (member.checked) {
+                        expenseAmount = expense.amount / totalChecked;
+                    }
+                } else {
+                    expenseAmount = Number(member.share)
+                }
+                if (expenseAmount > 0) {
+                    memberShares.push({ paidFor: member._id, amount: parseFloat(expenseAmount.toFixed(2)), splitType: expense.selectedOption.splitType });
+                }
             })
-
         }
         else if (expense.selectedOption.splitType == "BY_PERCENTAGE") {
             memberShares = expense.members.map(member => {
-                return { paidFor: member._id, amount: Number(expense.amount * (member.share / 100)), splitType: expense.selectedOption.splitType }
+                return { paidFor: member._id, amount: Number((expense.amount * (member.share / 100).toFixed(2))), splitType: expense.selectedOption.splitType }
             })
         }
         else {
             const totalShare = expense.members.reduce((a, b) => a + (Number(b["share"]) || 0), 0)
             memberShares = expense.members.map(member => {
-                return { paidFor: member._id, amount: Number((expense.amount * member.share) / totalShare), splitType: expense.selectedOption.splitType }
+                return { paidFor: member._id, amount: Number(((expense.amount * member.share) / totalShare).toFixed(2)), splitType: expense.selectedOption.splitType }
             })
         }
         payload["shares"] = memberShares
@@ -129,20 +138,30 @@ const AddExpenseDialog = ({ open, handleClose, setAlert }) => {
         payload["groupId"] = expense.groupId
         let memberShares = []
         if (expense.selectedOption.splitType == "BY_EQUALLY" || expense.selectedOption.splitType == "BY_AMOUNTS") {
-            memberShares = expense.members.map(member => {
-                const expenseAmount = member.share == undefined || !member.share ? expense.amount / expense.members.length : Number(member.share)
-                return { paidFor: member._id, amount: expenseAmount, splitType: expense.selectedOption.splitType }
+            expense.members.map(member => {
+                let expenseAmount = 0;
+                if (member.share == undefined || !member.share) {
+                    const totalChecked = expense.members.filter(m => { return m.checked }).length;
+                    if (member.checked) {
+                        expenseAmount =  parseFloat((expense.amount / totalChecked).toFixed(2));
+                    }
+                } else {
+                    expenseAmount = Number(member.share)
+                }
+                if (expenseAmount > 0) {
+                    memberShares.push({ paidFor: member._id, amount: expenseAmount, splitType: expense.selectedOption.splitType });
+                }
             })
         }
         else if (expense.selectedOption.splitType == "BY_PERCENTAGE") {
             memberShares = expense.members.map(member => {
-                return { paidFor: member._id, amount: Number(expense.amount * (member.share / 100)), splitType: expense.selectedOption.splitType }
+                return { paidFor: member._id, amount: Number((expense.amount * (member.share / 100)).toFixed(2)), splitType: expense.selectedOption.splitType }
             })
         }
         else {
             const totalShare = expense.members.reduce((a, b) => a + (Number(b["share"]) || 0), 0)
             memberShares = expense.members.map(member => {
-                return { paidFor: member._id, amount: Number((expense.amount * member.share) / totalShare), splitType: expense.selectedOption.splitType }
+                return { paidFor: member._id, amount: Number(((expense.amount * member.share) / totalShare).toFixed(2)), splitType: expense.selectedOption.splitType }
             })
         }
         payload["shares"] = memberShares
