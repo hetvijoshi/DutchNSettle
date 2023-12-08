@@ -71,7 +71,7 @@ const Group = ({ params }) => {
         const friendList = response.data.friends ? response.data.friends : [];
         let friends = [];
         friendList.map(f => {
-            let g = f.groups.find(g => g.groupId == params.slug);
+            let g = f.groups.find(g => g.groupId == params.slug && g.amount != 0);
             if (g != undefined) {
                 friends.push({ user: f.user, amount: g.amount });
             }
@@ -140,6 +140,7 @@ const Group = ({ params }) => {
     const closeSettleUpDialog = () => {
         setSettleUpFriend({});
         setSettleUp(false);
+        fetchPageData();
     }
 
     return (
@@ -164,7 +165,6 @@ const Group = ({ params }) => {
                         <Grid item>
                             <Box gap={2}>
                                 <Button onClick={clickOpenAddExpense}>Add an expense</Button>
-                                <Button>Settle up</Button>
                             </Box>
                         </Grid>
                     </Grid>
@@ -187,7 +187,7 @@ const Group = ({ params }) => {
                                 </Button>
                             </Card >
                         ))}
-                        {openSettleUp && (<SettleUp friend={settleUpFriend} open={openSettleUp} close={closeSettleUpDialog} setAlert={setAlert} />)}
+                        {openSettleUp && (<SettleUp friend={settleUpFriend} open={openSettleUp} close={closeSettleUpDialog} setAlert={setAlert} groupId={params.slug} />)}
                     </Grid>
 
                     <Divider sx={{ marginY: "10px" }} />
@@ -202,11 +202,11 @@ const Group = ({ params }) => {
                                         <Grid item xs={4}>
                                             <div>{expense.expenseSummary.expenseName}</div>
                                         </Grid>
-                                        <Grid item xs={3}>
+                                        <Grid item xs={4}>
                                             <div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You paid " : expense.expenseSummary.paidBy.firstName + " paid"} <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>${expense.expenseSummary.expenseAmount}</span></div>
                                         </Grid>
                                         <Grid item xs={3}>
-                                            <div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You lent " : "You owe "} <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>${expense.expenseSummary.paidBy._id == session.user["userId"] ? expense.expenseSummary.expenseAmount - expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"]).amount : expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"]).amount}</span></div>
+                                            <div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You lent " : "You owe "} <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>${expense.expenseSummary.paidBy._id == session.user["userId"] ? expense.expenseSummary.expenseAmount - (expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"])?.amount || 0) : expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"])?.amount}</span></div>
                                         </Grid>
                                     </Grid>
                                     {expandIndex == (index + 1) ? <ExpandLess /> : <ExpandMore />}

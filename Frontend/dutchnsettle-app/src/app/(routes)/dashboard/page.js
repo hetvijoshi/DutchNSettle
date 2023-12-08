@@ -1,5 +1,5 @@
 "use client";
-import { Box, Button, Container, Divider, Grid, Paper, Typography } from "@mui/material"
+import { Alert, AlertTitle, Box, Button, Container, Divider, Grid, Paper, Typography } from "@mui/material"
 import React, { useState, useEffect } from "react"
 import classes from "./dashboard.module.scss"
 import Tabs from "@/components/Tabs/Tabs"
@@ -49,6 +49,7 @@ const Dashboard = () => {
 
     const { data: session } = useSession();
     const friendsValue = { friends, setFriends };
+    const [alert, setAlert] = useState({ type: "", message: "" });
 
 
     const [dashboardArray, setDashboardArray] = useState([{ title: "Total balance", amount: 0 }, { title: "You owe", amount: 0 }, { title: "You are owed", amount: 0 }]);
@@ -101,6 +102,10 @@ const Dashboard = () => {
         resetExpenseContext()
     };
 
+    const handleAlertClose = () => {
+        setAlert({ type: "", message: "" });
+    }
+
     return (
         <Container>
             <div>
@@ -132,12 +137,18 @@ const Dashboard = () => {
                         })}
                     </Grid>
                     <Divider sx={{ marginY: "10px" }} />
+                    {alert && alert.type.length > 0 && alert.message.length > 0 &&
+                        <Alert severity={alert.type} onClose={() => { handleAlertClose() }}>
+                            <AlertTitle>{alert.type.toUpperCase()}</AlertTitle>
+                            {alert.message}
+                        </Alert>
+                    }
                     <FriendsContext.Provider value={friendsValue} >
                         <GroupsContext.Provider value={groupsValue} >
                             <Tabs tabList={["Friends", "Groups"]} />
                             {openAddExpense &&
                                 <ExpenseContext.Provider value={expenseValue}>
-                                    <AddExpenseDialog open={openAddExpense} handleClose={closeAddExpense} />
+                                    <AddExpenseDialog open={openAddExpense} handleClose={closeAddExpense} setAlert={setAlert} />
                                 </ExpenseContext.Provider>}
                         </GroupsContext.Provider >
                     </FriendsContext.Provider>

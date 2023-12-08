@@ -281,7 +281,7 @@ class ExpenseController {
                 })
             }
 
-
+            
             return res.status(200).json({
                 type: "success",
                 message: "No expenses found",
@@ -382,20 +382,19 @@ class ExpenseController {
             settleExpense.expenseName = expenseName;
             settleExpense.groupId = groupId;
             settleExpense.expenseDate = new Date(expenseDate).toISOString();
-            settleExpense = settleExpense.save();
+            settleExpense.save();
 
             let settleExpenseDetail = new ExpenseDetail();
             settleExpenseDetail.expenseId = settleExpense._id;
-            settleExpenseDetail.groupId = groupId;
             settleExpenseDetail.paidBy = new mongoose.Types.ObjectId(payerId);
-            settleExpenseDetail.paidFor = new mongoose.Types.ObjectId(creditor);
+            settleExpenseDetail.paidFor = new mongoose.Types.ObjectId(creditorId);
             settleExpenseDetail.splitType = SPLIT_TYPE.SETTLED;
             settleExpenseDetail.amount = amount;
             settleExpenseDetail.save();
 
             let payer = await getFriendsListByUserId(payerId);
-            if (creditorcreditor && creditor.friends && creditor.friends.length > 0) {
-                let friend1 = creditor.friends.find(f => f.user._id.toString() == creditorId);
+            if (payer && payer.friends && payer.friends.length > 0) {
+                let friend1 = payer.friends.find(f => f.user._id.toString() == creditorId);
                 let group1 = friend1.groups.find(g => g.groupId.toString() == groupId);
                 if (friend1 != undefined && group1) {
                     friend1.amount = friend1.amount + amount;
