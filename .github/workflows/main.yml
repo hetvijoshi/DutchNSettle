@@ -19,7 +19,7 @@ jobs:
           node-version: '16'
 
       - name: Deploy to backend on App Engine
-        run: gcloud app deploy ./Backend/dutchnsettle-app/app.yaml --quiet
+        run: gcloud app deploy ./Backend/dutchnsettle-api/app.yaml --quiet
         env:
           GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
 
