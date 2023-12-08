@@ -154,6 +154,7 @@ const AddExpenseDialog = ({ open, handleClose }) => {
         else {
             alert("Something went wrong")
         }
+        handleClose()
     }
 
     const handlePaidBy = (member) => {

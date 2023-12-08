@@ -111,7 +111,7 @@ const Dashboard = () => {
                         alignItems="center"
                     >
                         <Grid item ><Typography variant="h5" >Dashboard</Typography></Grid>
-                        <Grid item><Button className={classes.add_expense_button} onClick={clickOpenAddExpense}>Add an expense</Button><Button className={classes.settle_up_button}>Settle Up</Button></Grid>
+                        <Grid item><Button className={classes.add_expense_button} onClick={clickOpenAddExpense}>Add an expense</Button></Grid>
                     </Grid>
                     <Divider sx={{ marginY: "10px" }} />
                     <Grid container direction="row"

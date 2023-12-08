@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const { addExpense, addExpenseDetails, getUserBalance, getExpense } = require("../../services/expense/expenseService");
+const { addExpense, addExpenseDetails, getUserBalance, getExpense, getExpenseOverview, getExpenseDetail } = require("../../services/expense/expenseService");
 const { updateGroup } = require("../../services/group/groupService");
 const { getFriendsListByUserId } = require("../../services/user/friendsService");
 const { getUserDetailsById } = require("../../services/user/userService");
@@ -262,6 +262,37 @@ class ExpenseController {
             });
         }
     }
+
+    static async fetchGroupExpense(req, res) {
+        try {
+            const groupId = req.params.groupId;
+            let expenses = await getExpenseOverview(groupId);
+            let expenseIds = []
+            let expenseDetails = []
+            expenses.map(expense => {
+                expenseIds.push(expense._id)
+            })
+            if (expenseIds.length > 0) {
+                let expensesDetail = await getExpenseDetail(expenseIds)
+                expenseIds.map(expId => {
+                    const exp = expenses.find(e => e._id.toString() == expId)
+                    const filteredExpenses = expensesDetail.filter(e => e.expenseId._id.toString() == expId)
+                    expenseDetails.push({ expenseSummary: exp, expenseDetail: filteredExpenses })
+                })
+            }
+
+
+            return res.status(200).json({
+                type: "success",
+                message: "No expenses found",
+                data: expenseDetails,
+            });
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
 
     static async settleExpense(req, res) {
         try {
