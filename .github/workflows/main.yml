@@ -30,6 +30,6 @@ jobs:
           GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
 
       - name: Deploy to frontend on App Engine
-        run: gcloud app deploy ./Frontend/dutchnsettle-app/frontend.yaml --quiet
+        run: gcloud app deploy ./Frontend/dutchnsettle-app/app.yaml --quiet
         env:
           GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
