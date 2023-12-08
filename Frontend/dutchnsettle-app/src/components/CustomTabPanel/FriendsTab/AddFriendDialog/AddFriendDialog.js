@@ -3,9 +3,8 @@ import * as React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Box, Button, DialogActions, Typography } from "@mui/material";
+import { Autocomplete, TextField,Box, Button, DialogActions, Typography } from "@mui/material";
 import { useContext, useState } from "react";
-import SearchWrapper from "../../../SearchWrapper/SearchWrapper";
 import { useSession } from "next-auth/react";
 import { addFriend, getFriends, getSearchResults } from "@/app/services/FriendsService";
 import { FriendsContext } from "@/app/lib/utility/context";
@@ -20,17 +19,20 @@ export default function AddFriendDialog({ open, handleClose }) {
 
     const { setFriends } = useContext(FriendsContext);
 
-    const getDropDownvalues = async (value) => {
-        const searchResult = await getSearchResults(value, session["id_token"])
-        const users = searchResult.data.map((user) => {
-            return { ...user, displayItem: user.name }
-        })
-        setResults(users)
-    }
-
-    const handleChange = (value) => {
-        getDropDownvalues(value);
+    const defaultProps = {
+        options: results,
+        getOptionLabel: (option) => option.name,
     };
+
+    const getDropDownvalues = async (e) => {
+        const searchKey = e.target.value
+        console.log(searchKey)
+        setResults([]);
+        if (searchKey.length > 0) {
+            const searchResult = await getSearchResults(e.target.value, session["id_token"])
+            setResults(searchResult.data)
+        }
+    }
 
     const fetchAllFriends = async () => {
         const token = session["id_token"]
@@ -56,18 +58,23 @@ export default function AddFriendDialog({ open, handleClose }) {
             <Dialog open={open} onClose={handleClose} maxWidth={"sm"} sx={{ minWidth: "1000px" }} fullWidth>
                 <DialogTitle>Add Friend</DialogTitle>
                 <DialogContent>
-                    <Box display={"flex"} sx={{ paddingLeft: "10px" }}>
+                    <Box display={"flex"} gap={2}>
                         <Typography><b>To: </b></Typography>
-                        <SearchWrapper results={results} handleChange={handleChange} handleClick={addToFriendList} />
-                        {/* <div >
-                            <SearchBar setResults={setResults} />
-                            {results && results.length > 0 && <SearchResultsList results={results} setOpenAddFriend={setOpenAddFriend}/>}
-                        </div> */}
+                        <Autocomplete
+                                sx={{ width: "150px" }}
+                                {...defaultProps}
+                                id="disable-close-on-select"
+                                onInput={(value) => getDropDownvalues(value)}
+                                onChange={(e, value) => addToFriendList(value)}
+                                renderInput={(params) => {
+                                    return (<TextField {...params} variant="standard" />)
+                                }}
+                            />
+                       
                     </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleClose}>Submit</Button>
                 </DialogActions>
             </Dialog>
         </React.Fragment>

@@ -3,10 +3,9 @@ import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Avatar, Box, Button, DialogActions, IconButton, Typography } from "@mui/material";
+import { Autocomplete, Avatar, Box, Button, DialogActions, IconButton, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import React, { useContext, useEffect, useState } from "react";
-import SearchWrapper from "../../../SearchWrapper/SearchWrapper";
 import { getSearchResults } from "@/app/services/FriendsService";
 import { IoCloseSharp } from "react-icons/io5";
 import { createGroup, getGroupsByUser } from "@/app/services/GroupService";
@@ -18,31 +17,33 @@ export default function AddGroupDialog({ open, handleClose }) {
     const [groupName, setGroupName] = useState("");
     const { setGroups } = useContext(GroupsContext);
     const { data: session } = useSession()
-
     const [results, setResults] = useState([]);
 
-    const getDropDownvalues = async (value) => {
-        const searchResult = await getSearchResults(value, session["id_token"])
-        const users = searchResult.data.map((user) => {
-            return { ...user, displayItem: user.name }
-        })
-        setResults(users)
+    const getDropDownvalues = async (e) => {
+        const searchKey = e.target.value
+        setResults([]);
+        if (searchKey.length > 0) {
+            const searchResult = await getSearchResults(e.target.value, session["id_token"])
+            setResults(searchResult.data)
+        }
     }
 
-    const handleChange = (value) => {
-        setResults([]);
-        if (value && value.length > 0) {
-            getDropDownvalues(value);
-        }
+    const defaultProps = {
+        options: results,
+        getOptionLabel: (option) => option.name,
     };
+
 
     const handleGroupName = (e) => {
         setGroupName(e.target.value);
     }
 
     const addMemberToGroup = (result) => {
-        const ifExist = groupMembers.findIndex(item => item.email == result.email)
-        ifExist == -1 && setGroupMembers([...groupMembers, result])
+        if (result) {
+            const ifExist = groupMembers.findIndex(item => item.email == result.email)
+            ifExist == -1 && setGroupMembers([...groupMembers, result])
+        }
+        setResults([])
     }
 
     const removeMemberFromGroup = (member) => {
@@ -109,12 +110,20 @@ export default function AddGroupDialog({ open, handleClose }) {
                         </div>
                     </Box>
                     <section>
-                        <Box>
-                            <Typography marginTop={4}><b>Add Members</b></Typography>
+                        <Box display={"flex"} alignItems={"center"} marginTop={4} gap={3}>
+                            <Typography ><b>Add Members</b></Typography>
+                            <Autocomplete
+                                sx={{ width: "150px" }}
+                                {...defaultProps}
+                                id="disable-close-on-select"
+                                onInput={(value) => getDropDownvalues(value)}
+                                onChange={(e, value) => addMemberToGroup(value)}
+                                renderInput={(params) => {
+                                    return (<TextField {...params} variant="standard" />)
+                                }}
+                            />
                         </Box>
-                        <Box display={"flex"} alignItems={"center"}>
-                            <SearchWrapper results={results} handleChange={handleChange} handleClick={addMemberToGroup} onBlur={() => { }} />
-                        </Box>
+
                         {groupMembers.map((member) => (
                             <Box key={member.email} display={"flex"} alignItems={"center"} justifyContent={"space-between"} marginTop={2}>
                                 <Box gap={4} display={"flex"}>
