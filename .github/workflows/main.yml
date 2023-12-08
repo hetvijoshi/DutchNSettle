@@ -1,0 +1,32 @@
+name: Deploy to Google App Engine
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy to backend on App Engine
+        run: gcloud app deploy ./Backend/dutchnsettle-app/app.yaml --quiet
+        env:
+          GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
+
+      - name: Deploy to frontend on App Engine
+        run: gcloud app deploy ./Frontend/dutchnsettle-app/frontend.yaml --quiet
+        env:
+          GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
