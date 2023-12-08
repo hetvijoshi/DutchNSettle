@@ -288,6 +288,7 @@ class ExpenseController {
                 let friend1 = payer.friends.find(f => f.user._id.toString() == creditorId);
                 if (friend1 != undefined) {
                     friend1.amount = friend1.amount + amount;
+                    friend1.groups.map(g => { g.amount = 0; });
                     payer.save();
                 } else {
                     return res.status(500).json({
@@ -309,6 +310,7 @@ class ExpenseController {
                 let friend1 = creditor.friends.find(f => f.user._id.toString() == payerId);
                 if (friend1 != undefined) {
                     friend1.amount = friend1.amount - amount;
+                    friend1.groups.map(g => { g.amount = 0; });
                     creditor.save();
                 } else {
                     return res.status(500).json({

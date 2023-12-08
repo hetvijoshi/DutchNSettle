@@ -1,5 +1,5 @@
 "use client"
-import { Container, Paper, Grid, Box, Button, Typography, Divider } from "@mui/material"
+import { Avatar, Container, Paper, Grid, Box, Button, Typography, Divider, List, ListItemButton, Collapse, } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import classes from "./group.module.scss"
 import { useSession } from "next-auth/react"
@@ -12,6 +12,8 @@ import { FaEquals } from "react-icons/fa";
 import { FaPercentage } from "react-icons/fa";
 import { FaChartBar } from "react-icons/fa6";
 import dayjs from "dayjs"
+import { getFriends } from "@/app/services/FriendsService";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 
 
 const Group = ({ params }) => {
@@ -46,15 +48,40 @@ const Group = ({ params }) => {
         groupId: params.slug, groupName: groupDetail?.groupName, results: [], description: "", amount: "", members: [], paidBy: "", expenseDate: dayjs(new Date()), loggedInMember: {}, openSplitScreen: false, selectedOption: splitOptions[0], splitOptions: splitOptions, isGroup: true
     });
     const expenseValue = { expense, setExpense }
-    const { data: session } = useSession()
+    const { data: session } = useSession();
+    const [friends, setFriends] = useState();
+    const [expenseDetails, setExpenseDetails] = useState([]);
+    const [expandIndex, setExpandIndex] = useState(0);
 
     const fetchGroupDetail = async () => {
         const fetchGroupDetails = await getGroupDetail(params.slug, session["id_token"])
         setGroupDetail(fetchGroupDetails)
     }
 
+    const fetchFriends = async () => {
+        const token = session["id_token"]
+        const userId = session.user["userId"]
+        const response = await getFriends(userId, token)
+        const friendList = response.data.friends ? response.data.friends : [];
+        const friendData = friendList.filter(x => x.user._id == params.slug)
+        setFriends(friendData);
+    }
+
+    const fetchAllExpense = async (groupId) => {
+        // const token = session["id_token"];
+        // const response = await getGroupExpenseDetails({ groupId }, token)
+        // const expenseData = response.data ? response.data : {};
+        // setExpenseDetails(expenseData);
+    }
+
+    const fetchPageData = () => {
+        fetchGroupDetail();
+        fetchFriends();
+        fetchAllExpense(params.slug);
+    }
+
     useEffect(() => {
-        fetchGroupDetail()
+        fetchPageData()
     }, [params.slug])
 
     // useEffect(() => {
@@ -91,6 +118,14 @@ const Group = ({ params }) => {
         resetExpenseContext()
     };
 
+    const handleCollapse = (index) => {
+        if (expandIndex == (index + 1)) {
+            setExpandIndex(0);
+        } else {
+            setExpandIndex(index + 1);
+        }
+    }
+
     return (
         <>
             <Container padding={3}>
@@ -112,6 +147,55 @@ const Group = ({ params }) => {
                         </Grid>
                     </Grid>
                     <Divider sx={{ marginY: "10px" }} />
+                    {expenseDetails && expenseDetails.length > 0 && (
+                        expenseDetails.map((expense, index) => (
+                            <>
+                                <ListItemButton onClick={() => { handleCollapse(index) }} style={{ marginTop: 5, backgroundColor: colors.lightBlue, borderRadius: 3 }}>
+                                    <Grid container key={index} alignItems="center" style={{ padding: 10 }}>
+                                        <Grid item xs={1}>
+                                            <div>{new Date(expense.expenseSummary.expenseDate).toLocaleString("default", { month: "short", day: "numeric", year: "2-digit" })}</div>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <div>{expense.expenseSummary.expenseName}</div>
+                                        </Grid>
+                                        <Grid item xs={3}>
+                                            <div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You paid " : expense.expenseSummary.paidBy.firstName + " paid"} <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>${expense.expenseSummary.expenseAmount}</span></div>
+                                        </Grid>
+                                        <Grid item xs={3}>
+                                            <div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You lent " : "You owe "} <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>${expense.expenseSummary.paidBy._id == session.user["userId"] ? expense.expenseDetail.find(expense => expense.paidFor._id == params.slug).amount : expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"]).amount}</span></div>
+                                        </Grid>
+                                    </Grid>
+                                    {expandIndex == (index + 1) ? <ExpandLess /> : <ExpandMore />}
+                                </ListItemButton>
+                                <Collapse in={expandIndex == (index + 1)} timeout="auto" unmountOnExit>
+                                    <List component="div" disablePadding>
+                                        {expense.expenseDetail && expense.expenseDetail.length > 0 && (expense.expenseDetail.map((detail, index) => (
+                                            <ListItemButton sx={{ pl: 4 }} key={"d" + index}>
+                                                <Grid container key={index} alignItems="center" style={{ padding: 3 }}>
+                                                    <Grid item xs={1} display={"flex"} justifyContent={"center"}>{index + 1}.</Grid>
+                                                    <Grid item xs={1}><Avatar alt="Natacha" src={detail.paidFor.picture} /></Grid>
+                                                    <Grid item xs={2}>{detail.paidFor._id == session.user["userId"] ? "You owe" : detail.paidFor.firstName + " owe "}</Grid>
+                                                    <Grid item xs={2}>${detail.amount}</Grid>
+                                                </Grid>
+                                            </ListItemButton>
+                                        )
+
+                                        ))}
+                                    </List>
+                                </Collapse>
+
+                            </>
+                        ))
+
+                    )}
+                    {expenseDetails && expenseDetails.length == 0 && (
+                        <>
+                            
+                            <Container sx={{ marginTop: 5 }}>
+                                No expenses yet.
+                            </Container>
+                        </>
+                    )}
                 </Paper>
             </Container>
             {openAddExpense &&
