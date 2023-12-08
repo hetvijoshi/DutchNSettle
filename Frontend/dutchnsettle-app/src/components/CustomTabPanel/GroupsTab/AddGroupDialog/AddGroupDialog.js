@@ -16,7 +16,7 @@ import { GroupsContext } from "@/app/lib/utility/context";
 export default function AddGroupDialog({ open, handleClose }) {
     const [groupMembers, setGroupMembers] = useState([])
     const [groupName, setGroupName] = useState("");
-    const {setGroups}= useContext(GroupsContext);
+    const { setGroups } = useContext(GroupsContext);
     const { data: session } = useSession()
 
     const [results, setResults] = useState([]);
@@ -30,7 +30,10 @@ export default function AddGroupDialog({ open, handleClose }) {
     }
 
     const handleChange = (value) => {
-        getDropDownvalues(value);
+        setResults([]);
+        if (value && value.length > 0) {
+            getDropDownvalues(value);
+        }
     };
 
     const handleGroupName = (e) => {
@@ -53,7 +56,7 @@ export default function AddGroupDialog({ open, handleClose }) {
         const userId = session.user["userId"]
         const response = await getGroupsByUser(userId, token)
         setGroups(response.data)
-      }
+    }
 
     const submitGroup = async () => {
         const payload = {}
