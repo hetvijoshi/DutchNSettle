@@ -18,9 +18,6 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Install dependencies
-        run: npm install
-
       - name: Deploy to backend on App Engine
         run: gcloud app deploy ./Backend/dutchnsettle-app/app.yaml --quiet
         env:
