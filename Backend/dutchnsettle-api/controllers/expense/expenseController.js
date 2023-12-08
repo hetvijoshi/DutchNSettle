@@ -264,35 +264,28 @@ class ExpenseController {
     }
 
     static async fetchGroupExpense(req, res) {
-        let groupedData
         try {
             const groupId = req.params.groupId;
             let expenses = await getExpenseOverview(groupId);
-            let expenseDetailIds = []
+            let expenseIds = []
+            let expenseDetails = []
             expenses.map(expense => {
-                expenseDetailIds.push(...expenseDetailIds, expense._id)
+                expenseIds.push(expense._id)
             })
-            if (expenseDetailIds.length > 0) {
-                let expensesDetail = await getExpenseDetail(expenseDetailIds)
-                console.log(expensesDetail)
-                groupedData = expensesDetail.reduce((acc, record) => {
-                    console.log("acc", acc)
-                    console.log("record", record)
-                    const key = record.expenseId;
-                    const keyIndex = acc.find(record => record.expenseId === key);
-                    if(keyIndex!=-1){
-                        acc[keyIndex].expenseDetail.push(record)
-                    }
-                    console.log(acc)
-                    return acc;
-                }, {});
+            if (expenseIds.length > 0) {
+                let expensesDetail = await getExpenseDetail(expenseIds)
+                expenseIds.map(expId => {
+                    const exp = expenses.find(e => e._id.toString() == expId)
+                    const filteredExpenses = expensesDetail.filter(e => e.expenseId._id.toString() == expId)
+                    expenseDetails.push({ expenseSummary: exp, expenseDetail: filteredExpenses })
+                })
             }
 
 
             return res.status(200).json({
                 type: "success",
                 message: "No expenses found",
-                data: groupedData,
+                data: expenseDetails,
             });
         }
         catch (error) {

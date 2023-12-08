@@ -43,7 +43,7 @@ exports.getExpenseOverview = async (id) => {
     try {
 
         let matchQuery = { groupId: id }
-        result = await Expense.find(matchQuery)
+        result = await Expense.find(matchQuery).populate("paidBy")
     }
     catch (error) {
         return Promise.reject(error);
@@ -54,7 +54,7 @@ exports.getExpenseOverview = async (id) => {
 exports.getExpenseDetail = async (ids) => {
     let result;
     try {
-        result = await ExpenseDetail.find({ expenseId: { $in: ids } });
+        result = await ExpenseDetail.find({ expenseId: { $in: ids } }).populate("paidBy").populate("paidFor").populate("expenseId");
     }
     catch (error) {
         return Promise.reject(error);
