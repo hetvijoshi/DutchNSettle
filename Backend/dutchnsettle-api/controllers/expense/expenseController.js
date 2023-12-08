@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const { addExpense, addExpenseDetails, getUserBalance, getExpense } = require("../../services/expense/expenseService");
+const { addExpense, addExpenseDetails, getUserBalance, getExpense, getExpenseOverview, getExpenseDetail } = require("../../services/expense/expenseService");
 const { updateGroup } = require("../../services/group/groupService");
 const { getFriendsListByUserId } = require("../../services/user/friendsService");
 const { getUserDetailsById } = require("../../services/user/userService");
@@ -262,6 +262,44 @@ class ExpenseController {
             });
         }
     }
+
+    static async fetchGroupExpense(req, res) {
+        let groupedData
+        try {
+            const groupId = req.params.groupId;
+            let expenses = await getExpenseOverview(groupId);
+            let expenseDetailIds = []
+            expenses.map(expense => {
+                expenseDetailIds.push(...expenseDetailIds, expense._id)
+            })
+            if (expenseDetailIds.length > 0) {
+                let expensesDetail = await getExpenseDetail(expenseDetailIds)
+                console.log(expensesDetail)
+                groupedData = expensesDetail.reduce((acc, record) => {
+                    console.log("acc", acc)
+                    console.log("record", record)
+                    const key = record.expenseId;
+                    const keyIndex = acc.find(record => record.expenseId === key);
+                    if(keyIndex!=-1){
+                        acc[keyIndex].expenseDetail.push(record)
+                    }
+                    console.log(acc)
+                    return acc;
+                }, {});
+            }
+
+
+            return res.status(200).json({
+                type: "success",
+                message: "No expenses found",
+                data: groupedData,
+            });
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
 
     static async settleExpense(req, res) {
         try {
