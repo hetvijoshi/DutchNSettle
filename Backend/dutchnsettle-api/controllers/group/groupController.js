@@ -20,21 +20,21 @@ class GroupController {
                         if (friend.friends.length > 0) {
                             if (friend.friends.find(f => f.user.toString() == groupMembers[j].user) == undefined) {
                                 friend.friends = [...friend.friends, { user: groupMembers[j].user }];
-                                friend.save();
+                                await friend.save();
 
                             }
                         } else {
                             friend = new Friends();
                             friend.user = groupMembers[i].user;
                             friend.friends = [{ user: groupMembers[j].user }];
-                            friend.save();
+                            await friend.save();
                         }
 
                     } else {
                         friend = new Friends();
                         friend.user = groupMembers[i].user;
                         friend.friends = [{ user: groupMembers[j].user }];
-                        friend.save();
+                        await friend.save();
                     }
 
                     friend = friendRecords.find(f => f.user.toString() == groupMembers[j].user);
@@ -42,19 +42,19 @@ class GroupController {
                         if (friend.friends.length > 0) {
                             if (friend.friends.find(f => f.user.toString() == groupMembers[i].user) == undefined) {
                                 friend.friends = [...friend.friends, { user: groupMembers[i].user }];
-                                friend.save();
+                                await friend.save();
                             }
                         } else {
                             friend = new Friends();
                             friend.user = groupMembers[j].user;
                             friend.friends = [{ user: groupMembers[i].user }];
-                            friend.save();
+                            await friend.save();
                         }
                     } else {
                         friend = new Friends();
                         friend.user = groupMembers[j].user;
                         friend.friends = [{ user: groupMembers[i].user }];
-                        friend.save();
+                        await friend.save();
                     }
                 }
             }
