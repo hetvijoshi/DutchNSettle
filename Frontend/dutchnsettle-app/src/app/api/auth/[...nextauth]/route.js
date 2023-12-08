@@ -3,15 +3,15 @@ import GoogleProvider from "next-auth/providers/google"
 import jwt from "jsonwebtoken"
 import { createUser, fetchUser } from "@/app/services/AuthService"
 
-const GOOGLE_CLIENT_ID = "887708871770-p3mli4kh7btf56ri42nnbveefcchqtpv.apps.googleusercontent.com"
-const GOOGLE_CLIENT_SECRET = "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"
+
 const authOptions = NextAuth({
     providers: [
         GoogleProvider({
-            clientId: GOOGLE_CLIENT_ID ?? " ",
-            clientSecret: GOOGLE_CLIENT_SECRET ?? ""
+            clientId: "887708871770-p3mli4kh7btf56ri42nnbveefcchqtpv.apps.googleusercontent.com",
+            clientSecret: "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"
         })
     ],
+    secret: "61a13d5d67bf7a9a7bdcd6f3a1b7832d",
     callbacks: {
         async signIn({ user, profile, account }) {
             if (user && account) {

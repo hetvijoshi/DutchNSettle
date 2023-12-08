@@ -1,8 +1,11 @@
 import React, { useState } from "react"
-import { Container, Typography, Box, IconButton, Menu, MenuItem, Tooltip, Avatar, Grid, Button, linkClasses } from "@mui/material";
+import { Container, Typography, Box, IconButton, Menu, MenuItem, Tooltip, Avatar, Grid, Button } from "@mui/material";
 import classes from "./Navbar.module.scss";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { FRONTEND_URL } from "../../app/lib/utility/Constants";
+
+
 
 export const Navbar = () => {
     const settings = [{ title: "Profile", link: "/profile" }, { title: "Dashboard", link: "/dashboard" }, { title: "Logout" }];
@@ -23,6 +26,7 @@ export const Navbar = () => {
             router.push(link);
         }
     };
+
     return (
         <nav className={classes.navbar}>
             <Container>
@@ -55,7 +59,7 @@ export const Navbar = () => {
                                     onClose={handleCloseUserMenu}
                                 >
                                     {settings.map((setting) => (
-                                        <MenuItem key={setting.title} onClick={() => { setting.title == "Logout" ? signOut({ callbackUrl: "http://localhost:3000" }) : handleCloseUserMenu(setting.link) }}>
+                                        <MenuItem key={setting.title} onClick={() => { setting.title == "Logout" ? signOut({ callbackUrl: FRONTEND_URL }) : handleCloseUserMenu(setting.link) }}>
                                             <Typography textAlign="center">{setting.title}</Typography>
                                         </MenuItem>
                                     ))}
@@ -63,7 +67,7 @@ export const Navbar = () => {
 
                             </Box>
                         </Grid>
-                    ) : <Button className={classes.sign_in_button} onClick={() => signIn("google", { callbackUrl: "http://localhost:3000/dashboard" })}>Sign In</Button>
+                    ) : <Button className={classes.sign_in_button} onClick={() => signIn("google", { callbackUrl: `${FRONTEND_URL}/dashboard` })}>Sign In</Button>
                     }
                 </Grid>
             </Container>
