@@ -1,20 +1,23 @@
 "use client";
-import React, { lazy, useContext, useEffect } from "react";
+import React, { lazy, useState, useContext, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import CustomTabPanel from "../CustomTabPanel/CustomTabPanel";
-import { Button } from "@mui/material";
+import { Alert, AlertTitle, Button } from "@mui/material";
 import classes from "./Tabs.module.scss"
 import AddFriendDialog from "../CustomTabPanel/FriendsTab/AddFriendDialog/AddFriendDialog";
 import { FriendsContext } from "@/app/lib/utility/context";
+
 const AddGroupDialog = lazy(() => import("../CustomTabPanel/GroupsTab/AddGroupDialog/AddGroupDialog"))
 
 export default function Tabs({ tabList }) {
     const [value, setValue] = React.useState("1");
     const { friends } = useContext(FriendsContext);
+    const [alert, setAlert] = useState({ type: "", message: "" });
+    const [groupAlert, setGroupAlert] = useState({ type: "", message: "" });
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -39,11 +42,31 @@ export default function Tabs({ tabList }) {
         setOpenAddGroup(false);
     };
 
+    const handleAlertClose = () => {
+        setAlert({ type: "", message: "" });
+    }
+
+    const handleGroupAlertClose = () => {
+        setGroupAlert({ type: "", message: "" });
+    }
+
     useEffect(() => { }, [friends])
 
     return (
         <>
             <Box sx={{ width: "100%", typography: "body1" }}>
+                {alert && alert.type.length > 0 && alert.message.length > 0 &&
+                    <Alert severity={alert.type} onClose={() => { handleAlertClose() }}>
+                        <AlertTitle>{alert.type.toUpperCase()}</AlertTitle>
+                        {alert.message}
+                    </Alert>
+                }
+                {groupAlert && groupAlert.type.length > 0 && groupAlert.message.length > 0 &&
+                    <Alert severity={groupAlert.type} onClose={() => { handleGroupAlertClose() }}>
+                        <AlertTitle>{groupAlert.type.toUpperCase()}</AlertTitle>
+                        {groupAlert.message}
+                    </Alert>
+                }
                 <TabContext value={value}
                 >
                     <Box sx={{ borderBottom: 1, borderColor: "divider" }} display={"flex"} justifyContent={"space-between"} alignItems={"center"}>
@@ -65,8 +88,8 @@ export default function Tabs({ tabList }) {
                     ))}
                 </TabContext>
             </Box>
-            {openAddFriend && <AddFriendDialog open={openAddFriend} handleClose={closeAddFriend} />}
-            {openAddGroup && <AddGroupDialog open={openAddGroup} handleClose={closeAddGroup} />}
+            {openAddFriend && <AddFriendDialog open={openAddFriend} handleClose={closeAddFriend} setAlert={setAlert} />}
+            {openAddGroup && <AddGroupDialog open={openAddGroup} handleClose={closeAddGroup} setGroupAlert={setGroupAlert} />}
 
         </>
     );

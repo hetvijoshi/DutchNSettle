@@ -12,7 +12,7 @@ import { createGroup, getGroupsByUser } from "@/app/services/GroupService";
 import { GroupsContext } from "@/app/lib/utility/context";
 
 
-export default function AddGroupDialog({ open, handleClose }) {
+export default function AddGroupDialog({ open, handleClose, setGroupAlert }) {
     const [groupMembers, setGroupMembers] = useState([])
     const [groupName, setGroupName] = useState("");
     const { setGroups } = useContext(GroupsContext);
@@ -67,18 +67,18 @@ export default function AddGroupDialog({ open, handleClose }) {
         payload["createdBy"] = session?.user["userId"];
         if (groupName && groupName != "" && groupMembers.length > 1) {
             const response = await createGroup(payload, session["id_token"])
-            if (response.type == "success") {
-                alert("Group created successfully")
+            if (response) {
+                let { type, message } = response;
+                setGroupAlert({ type: type.toLowerCase() == "fail" ? "error" : "success", message })
                 fetchAllGroups()
+            } else {
+                setGroupAlert({ type: "error", message: "Something went wrong." })
             }
-            else {
-                alert("Something went wrong")
-            }
-            handleClose()
         }
         else {
-            alert(" provide all mandatory fields ")
+            setGroupAlert({ type: "error", message: "Provide all required fields" })
         }
+        handleClose()
 
     }
 
@@ -95,7 +95,7 @@ export default function AddGroupDialog({ open, handleClose }) {
                 <DialogTitle>Create new group</DialogTitle>
                 <DialogContent>
                     <Box display={"flex"} alignItems={"center"} gap={2}>
-                        <div><Typography><b>Group Name</b></Typography></div>
+                        <div><Typography><b>Group Name*</b></Typography></div>
                         <div>
                             <TextField
                                 autoFocus
@@ -111,7 +111,7 @@ export default function AddGroupDialog({ open, handleClose }) {
                     </Box>
                     <section>
                         <Box display={"flex"} alignItems={"center"} marginTop={4} gap={3}>
-                            <Typography ><b>Add Members</b></Typography>
+                            <Typography ><b>Add Members*</b></Typography>
                             <Autocomplete
                                 sx={{ width: "150px" }}
                                 {...defaultProps}

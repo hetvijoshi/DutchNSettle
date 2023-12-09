@@ -3,13 +3,14 @@ import * as React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Autocomplete, TextField,Box, Button, DialogActions, Typography } from "@mui/material";
+import { Autocomplete, TextField, Box, Button, DialogActions, Typography } from "@mui/material";
 import { useContext, useState } from "react";
 import { useSession } from "next-auth/react";
 import { addFriend, getFriends, getSearchResults } from "@/app/services/FriendsService";
 import { FriendsContext } from "@/app/lib/utility/context";
 
-export default function AddFriendDialog({ open, handleClose }) {
+
+export default function AddFriendDialog({ open, handleClose, setAlert }) {
 
 
     //Implement functionality to add multiple friends at a time
@@ -47,10 +48,13 @@ export default function AddFriendDialog({ open, handleClose }) {
         const token = session["id_token"]
         const addFriends = await addFriend(payload, token)
         if (addFriends) {
-            alert(addFriends.message)
-            handleClose()
+            let { type, message } = addFriends;
+            setAlert({ type: type.toLowerCase() == "fail" ? "error" : "success", message })
             fetchAllFriends()
+        } else {
+            setAlert({ type: "error", message: "Something went wrong." })
         }
+        handleClose()
     }
 
     return (
@@ -59,18 +63,17 @@ export default function AddFriendDialog({ open, handleClose }) {
                 <DialogTitle>Add Friend</DialogTitle>
                 <DialogContent>
                     <Box display={"flex"} gap={2}>
-                        <Typography><b>To: </b></Typography>
+                        <Typography><b>Name or email: </b></Typography>
                         <Autocomplete
-                                sx={{ width: "150px" }}
-                                {...defaultProps}
-                                id="disable-close-on-select"
-                                onInput={(value) => getDropDownvalues(value)}
-                                onChange={(e, value) => addToFriendList(value)}
-                                renderInput={(params) => {
-                                    return (<TextField {...params} variant="standard" />)
-                                }}
-                            />
-                       
+                            sx={{ width: "150px" }}
+                            {...defaultProps}
+                            id="disable-close-on-select"
+                            onInput={(value) => getDropDownvalues(value)}
+                            onChange={(e, value) => addToFriendList(value)}
+                            renderInput={(params) => {
+                                return (<TextField {...params} variant="standard" />)
+                            }}
+                        />
                     </Box>
                 </DialogContent>
                 <DialogActions>
