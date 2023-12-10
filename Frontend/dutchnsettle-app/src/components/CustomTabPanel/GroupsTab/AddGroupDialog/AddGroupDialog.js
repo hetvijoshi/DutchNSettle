@@ -12,7 +12,7 @@ import { createGroup, getGroupsByUser } from "@/app/services/GroupService";
 import { GroupsContext } from "@/app/lib/utility/context";
 
 
-export default function AddGroupDialog({ open, handleClose }) {
+export default function AddGroupDialog({ open, handleClose, setAlert }) {
     const [groupMembers, setGroupMembers] = useState([])
     const [groupName, setGroupName] = useState("");
     const { setGroups } = useContext(GroupsContext);
@@ -68,16 +68,16 @@ export default function AddGroupDialog({ open, handleClose }) {
         if (groupName && groupName != "" && groupMembers.length > 1) {
             const response = await createGroup(payload, session["id_token"])
             if (response.type == "success") {
-                alert("Group created successfully")
-                fetchAllGroups()
+                setAlert({ type: response.type, message: response.message })
+                fetchAllGroups();
             }
             else {
-                alert("Something went wrong")
+                setAlert({ type: "error", message: "Something went wrong." })
             }
-            handleClose()
+            handleClose();
         }
         else {
-            alert(" provide all mandatory fields ")
+            setAlert({ type: "error", message: "Provide all mandatory fields." })
         }
 
     }

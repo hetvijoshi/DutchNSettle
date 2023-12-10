@@ -132,6 +132,7 @@ const Profile = () => {
                             error={error && error.firstName != undefined && error.firstName.length > 0}
                             helperText={error && error.firstName ? error.firstName : ""}
                             onChange={(e) => handleChange("firstName", e.target.value)}
+                            InputLabelProps={{ shrink: true }}
                         />
                         <TextField
                             id="outlined-LastName-input"
@@ -143,6 +144,7 @@ const Profile = () => {
                             error={error && error.lastName != undefined && error.lastName.length > 0}
                             helperText={error && error.lastName ? error.lastName : ""}
                             onChange={(e) => handleChange("lastName", e.target.value)}
+                            InputLabelProps={{ shrink: true }}
                         />
                         <TextField
                             id="outlined-email-input"
@@ -152,6 +154,7 @@ const Profile = () => {
                             autoComplete="current-email"
                             value={userDetails?.email}
                             disabled={true}
+                            InputLabelProps={{ shrink: true }}
                         />
                         <TextField
                             id="outlined-phone-input"
@@ -163,6 +166,7 @@ const Profile = () => {
                             error={error && error.phone != undefined && error.phone.length > 0}
                             helperText={error && error.phone ? error.phone : ""}
                             onChange={(e) => handleChange("phone", e.target.value)}
+                            InputLabelProps={{ shrink: true }}
                         />
                     </div>
 
