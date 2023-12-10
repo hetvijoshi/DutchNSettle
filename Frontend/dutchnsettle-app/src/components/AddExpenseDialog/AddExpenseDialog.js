@@ -1,4 +1,4 @@
-import {  Autocomplete, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material"
+import { Autocomplete, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material"
 import React, { useContext, useState } from "react"
 import { useSession } from "next-auth/react";
 import { getFriends, getSearchResults } from "@/app/services/FriendsService";
@@ -16,7 +16,7 @@ const AddExpenseDialog = ({ open, handleClose, setAlert }) => {
     const { expense, setExpense } = useContext(ExpenseContext)
     const [errors, setErrors] = useState({ description: "", amount: "", membersInvolved: "", membersShareSum: "" });
     const { setFriends } = useContext(FriendsContext);
-        const defaultProps = {
+    const defaultProps = {
         options: expense.members,
         getOptionLabel: (option) => option.name,
     };
@@ -37,13 +37,16 @@ const AddExpenseDialog = ({ open, handleClose, setAlert }) => {
     const userId = session.user["userId"]
 
     const getDropDownvalues = async (value) => {
-        const searchResult = await getSearchResults(value, session["id_token"])
-        const users = searchResult.data.map((user) => {
-            if (user._id != userId) {
-                return { ...user, displayItem: user.name }
-            }
-        })
-        setExpense({ ...expense, results: users })
+        if (value.length > 0) {
+            const searchResult = await getSearchResults(value, session["id_token"])
+            const users = searchResult.data.map((user) => {
+                if (user._id != userId) {
+                    return { ...user, displayItem: user.name }
+                }
+            })
+            setExpense({ ...expense, results: users })
+        }
+
     }
 
     const handleChange = (value) => {
@@ -143,7 +146,7 @@ const AddExpenseDialog = ({ open, handleClose, setAlert }) => {
                 if (member.share == undefined || !member.share) {
                     const totalChecked = expense.members.filter(m => { return m.checked }).length;
                     if (member.checked) {
-                        expenseAmount =  parseFloat((expense.amount / totalChecked).toFixed(2));
+                        expenseAmount = parseFloat((expense.amount / totalChecked).toFixed(2));
                     }
                 } else {
                     expenseAmount = Number(member.share)

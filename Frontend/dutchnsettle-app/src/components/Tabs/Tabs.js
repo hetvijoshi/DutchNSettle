@@ -10,11 +10,14 @@ import { Button } from "@mui/material";
 import classes from "./Tabs.module.scss"
 import AddFriendDialog from "../CustomTabPanel/FriendsTab/AddFriendDialog/AddFriendDialog";
 import { FriendsContext } from "@/app/lib/utility/context";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 const AddGroupDialog = lazy(() => import("../CustomTabPanel/GroupsTab/AddGroupDialog/AddGroupDialog"))
 
 export default function Tabs({ tabList }) {
     const [value, setValue] = React.useState("1");
     const { friends } = useContext(FriendsContext);
+    const [alert, setAlert] = React.useState({ type: "", message: "" });
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -39,11 +42,21 @@ export default function Tabs({ tabList }) {
         setOpenAddGroup(false);
     };
 
+    const handleAlertClose = () => {
+        setAlert({ type: "", message: "" });
+    }
+
     useEffect(() => { }, [friends])
 
     return (
         <>
             <Box sx={{ width: "100%", typography: "body1" }}>
+                {alert && alert.type.length > 0 && alert.message.length > 0 &&
+                    <Alert severity={alert.type} onClose={() => { handleAlertClose() }}>
+                        <AlertTitle>{alert.type.toUpperCase()}</AlertTitle>
+                        {alert.message}
+                    </Alert>
+                }
                 <TabContext value={value}
                 >
                     <Box sx={{ borderBottom: 1, borderColor: "divider" }} display={"flex"} justifyContent={"space-between"} alignItems={"center"}>
@@ -65,8 +78,8 @@ export default function Tabs({ tabList }) {
                     ))}
                 </TabContext>
             </Box>
-            {openAddFriend && <AddFriendDialog open={openAddFriend} handleClose={closeAddFriend} />}
-            {openAddGroup && <AddGroupDialog open={openAddGroup} handleClose={closeAddGroup} />}
+            {openAddFriend && <AddFriendDialog open={openAddFriend} handleClose={closeAddFriend} setAlert={setAlert} />}
+            {openAddGroup && <AddGroupDialog open={openAddGroup} handleClose={closeAddGroup} setAlert={setAlert} />}
 
         </>
     );
