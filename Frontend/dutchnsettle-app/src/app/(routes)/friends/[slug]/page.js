@@ -119,7 +119,9 @@ const Friends = ({ params }) => {
                       <div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You paid " : expense.expenseSummary.paidBy.firstName + " paid"} <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>${expense.expenseSummary.expenseAmount}</span></div>
                     </Grid>
                     <Grid item xs={3}>
-                      <div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You lent " : "You owe "} <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>${expense.expenseSummary.paidBy._id == session.user["userId"] ? expense.expenseDetail.find(expense => expense.paidFor._id == params.slug).amount : expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"]).amount}</span></div>
+                      {expense.expenseDetail[0].splitType != "SETTLED" &&
+                        (<div>{expense.expenseSummary.paidBy._id == session.user["userId"] ? "You lent " : "You owe "} <span style={{ color: expense.expenseSummary.paidBy._id == session.user["userId"] ? "green" : "red" }}>${expense.expenseSummary.paidBy._id == session.user["userId"] ? expense.expenseDetail.find(expense => expense.paidFor._id == params.slug).amount : expense.expenseDetail.find(expense => expense.paidFor._id == session.user["userId"]).amount}</span></div>)}
+
                     </Grid>
                   </Grid>
                   {expandIndex == (index + 1) ? <ExpandLess /> : <ExpandMore />}

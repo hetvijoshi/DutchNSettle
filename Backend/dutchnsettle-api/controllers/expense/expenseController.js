@@ -296,7 +296,9 @@ class ExpenseController {
 
     static async settleExpense(req, res) {
         try {
-            const { payerId, creditorId, amount, expenseName, expenseDate } = req.body;
+            let { payerId, creditorId, amount, expenseName, expenseDate } = req.body;
+
+            amount = parseFloat(amount.toFixed(2));
 
             let settleExpense = new Expense();
             settleExpense.paidBy = new mongoose.Types.ObjectId(payerId);
@@ -374,7 +376,9 @@ class ExpenseController {
 
     static async settleGroupExpense(req, res) {
         try {
-            const { payerId, creditorId, amount, groupId, expenseName, expenseDate } = req.body;
+            let { payerId, creditorId, amount, groupId, expenseName, expenseDate } = req.body;
+
+            amount = parseFloat(amount.toFixed(2));
 
             let settleExpense = new Expense();
             settleExpense.paidBy = new mongoose.Types.ObjectId(payerId);
