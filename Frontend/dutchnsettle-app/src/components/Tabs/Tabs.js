@@ -17,7 +17,6 @@ export default function Tabs({ tabList }) {
     const [value, setValue] = React.useState("1");
     const { friends } = useContext(FriendsContext);
     const [alert, setAlert] = useState({ type: "", message: "" });
-    const [groupAlert, setGroupAlert] = useState({ type: "", message: "" });
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -46,10 +45,6 @@ export default function Tabs({ tabList }) {
         setAlert({ type: "", message: "" });
     }
 
-    const handleGroupAlertClose = () => {
-        setGroupAlert({ type: "", message: "" });
-    }
-
     useEffect(() => { }, [friends])
 
     return (
@@ -59,12 +54,6 @@ export default function Tabs({ tabList }) {
                     <Alert severity={alert.type} onClose={() => { handleAlertClose() }}>
                         <AlertTitle>{alert.type.toUpperCase()}</AlertTitle>
                         {alert.message}
-                    </Alert>
-                }
-                {groupAlert && groupAlert.type.length > 0 && groupAlert.message.length > 0 &&
-                    <Alert severity={groupAlert.type} onClose={() => { handleGroupAlertClose() }}>
-                        <AlertTitle>{groupAlert.type.toUpperCase()}</AlertTitle>
-                        {groupAlert.message}
                     </Alert>
                 }
                 <TabContext value={value}
@@ -89,7 +78,7 @@ export default function Tabs({ tabList }) {
                 </TabContext>
             </Box>
             {openAddFriend && <AddFriendDialog open={openAddFriend} handleClose={closeAddFriend} setAlert={setAlert} />}
-            {openAddGroup && <AddGroupDialog open={openAddGroup} handleClose={closeAddGroup} setGroupAlert={setGroupAlert} />}
+            {openAddGroup && <AddGroupDialog open={openAddGroup} handleClose={closeAddGroup} setGroupAlert={setAlert} />}
 
         </>
     );
