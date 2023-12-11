@@ -1,23 +1,22 @@
 "use client";
-import React, { lazy, useContext, useEffect } from "react";
+import React, { lazy, useState, useContext, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import CustomTabPanel from "../CustomTabPanel/CustomTabPanel";
-import { Button } from "@mui/material";
+import { Alert, AlertTitle, Button } from "@mui/material";
 import classes from "./Tabs.module.scss"
 import AddFriendDialog from "../CustomTabPanel/FriendsTab/AddFriendDialog/AddFriendDialog";
 import { FriendsContext } from "@/app/lib/utility/context";
-import Alert from "@mui/material/Alert";
-import AlertTitle from "@mui/material/AlertTitle";
+
 const AddGroupDialog = lazy(() => import("../CustomTabPanel/GroupsTab/AddGroupDialog/AddGroupDialog"))
 
 export default function Tabs({ tabList }) {
     const [value, setValue] = React.useState("1");
     const { friends } = useContext(FriendsContext);
-    const [alert, setAlert] = React.useState({ type: "", message: "" });
+    const [alert, setAlert] = useState({ type: "", message: "" });
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -79,7 +78,7 @@ export default function Tabs({ tabList }) {
                 </TabContext>
             </Box>
             {openAddFriend && <AddFriendDialog open={openAddFriend} handleClose={closeAddFriend} setAlert={setAlert} />}
-            {openAddGroup && <AddGroupDialog open={openAddGroup} handleClose={closeAddGroup} setAlert={setAlert} />}
+            {openAddGroup && <AddGroupDialog open={openAddGroup} handleClose={closeAddGroup} setGroupAlert={setAlert} />}
 
         </>
     );

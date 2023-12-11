@@ -5,15 +5,11 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FRONTEND_URL } from "../../app/lib/utility/Constants";
 
-
-
 export const Navbar = () => {
     const settings = [{ title: "Profile", link: "/profile" }, { title: "Dashboard", link: "/dashboard" }, { title: "Logout" }];
     const [anchorElUser, setAnchorElUser] = useState(null);
     const { data: session } = useSession()
     const router = useRouter();
-
-    console.log(session)
 
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);

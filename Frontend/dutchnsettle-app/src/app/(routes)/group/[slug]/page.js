@@ -248,7 +248,7 @@ const Group = ({ params }) => {
             </Container >
             {openAddExpense &&
                 <ExpenseContext.Provider value={expenseValue}>
-                    <AddExpenseDialog open={openAddExpense} handleClose={closeAddExpense} setAlert={setAlert} />
+                    <AddExpenseDialog open={openAddExpense} handleClose={closeAddExpense} setAlert={setAlert} setExpenseDetails={setExpenseDetails} />
                 </ExpenseContext.Provider>}
         </>
     )
