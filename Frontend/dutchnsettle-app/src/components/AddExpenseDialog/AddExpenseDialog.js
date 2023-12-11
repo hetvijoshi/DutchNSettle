@@ -5,14 +5,14 @@ import { getFriends, getSearchResults } from "@/app/services/FriendsService";
 import AutoComplete from "../AutoComplete/AutoComplete";
 import SplitOptionsSection from "./SplitOptionsSection/SplitOptionsSection";
 import { ExpenseContext, FriendsContext } from "@/app/lib/utility/context";
-import { addIndividualExpense } from "@/app/services/ExpenseService";
+import { addIndividualExpense, getGroupExpenseDetails } from "@/app/services/ExpenseService";
 import { addGroupExpense } from "@/app/services/GroupService";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 
-const AddExpenseDialog = ({ open, handleClose, setAlert }) => {
+const AddExpenseDialog = ({ open, handleClose, setAlert, setExpenseDetails }) => {
     const { expense, setExpense } = useContext(ExpenseContext)
     const [errors, setErrors] = useState({ description: "", amount: "", membersInvolved: "", membersShareSum: "" });
     const { setFriends } = useContext(FriendsContext);
@@ -81,17 +81,37 @@ const AddExpenseDialog = ({ open, handleClose, setAlert }) => {
     }
 
     const handleSubmit = () => {
+        let err = { ...errors };
         const payload = {}
         payload["expenseName"] = expense.description
         payload["expenseAmount"] = Number(expense.amount)
         payload["paidBy"] = expense.paidBy
         payload["expenseDate"] = expense.expenseDate
-        if (expense.isGroup) {
-            postGroupExpense(payload)
+        if (expense?.members?.length > 1) {
+            if (expense.description) {
+                if (expense.amount) {
+                    if (expense.isGroup) {
+                        postGroupExpense(payload)
+                    }
+                    else {
+                        postIndividualExpense(payload)
+                    }
+                }
+            }
         }
         else {
-            postIndividualExpense(payload)
+            err.membersInvolved = "Expense should be between atleast 2 members"
         }
+        if (!expense.description) { err.description = "Please enter description" }
+        if (!expense.amount) { err.amount = "Please enter amount" }
+        setErrors(err)
+    }
+
+    const fetchAllExpense = async (groupId) => {
+        const token = session["id_token"];
+        const response = await getGroupExpenseDetails(groupId, token)
+        const expenseData = response.data ? response.data : {};
+        setExpenseDetails(expenseData);
     }
 
     const postIndividualExpense = async (payload) => {
@@ -171,6 +191,7 @@ const AddExpenseDialog = ({ open, handleClose, setAlert }) => {
         const addExpense = await addGroupExpense(payload, token)
         if (addExpense?.type == "success") {
             setAlert({ type: addExpense.type, message: "Group Expense added successfully" })
+            fetchAllExpense(expense?.groupId)
         }
         else {
             setAlert({ type: "error", message: "Something went wrong." })
@@ -179,7 +200,9 @@ const AddExpenseDialog = ({ open, handleClose, setAlert }) => {
     }
 
     const handlePaidBy = (member) => {
-        expense.paidBy = member._id
+        if(member){
+            expense.paidBy = member._id
+        }
     }
 
     const handleExpenseDate = (e) => {
@@ -274,6 +297,10 @@ const AddExpenseDialog = ({ open, handleClose, setAlert }) => {
             </Dialog>
         </React.Fragment>
     )
+}
+
+AddExpenseDialog.propTypes = {
+    setExpenseDetails: {}
 }
 
 export default AddExpenseDialog
