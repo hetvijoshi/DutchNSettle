@@ -46,10 +46,13 @@ export default function AddFriendDialog({ open, handleClose, setAlert }) {
         const token = session["id_token"]
         const addFriends = await addFriend(payload, token)
         if (addFriends) {
-            setAlert({ type: addFriends.type, message: addFriends.message })
-            handleClose()
+            let { type, message } = addFriends;
+            setAlert({ type: type.toLowerCase() == "fail" ? "error" : "success", message })
             fetchAllFriends()
+        } else {
+            setAlert({ type: "error", message: "Something went wrong." })
         }
+        handleClose()
     }
 
     return (
@@ -58,7 +61,7 @@ export default function AddFriendDialog({ open, handleClose, setAlert }) {
                 <DialogTitle>Add Friend</DialogTitle>
                 <DialogContent>
                     <Box display={"flex"} gap={2}>
-                        <Typography><b>To: </b></Typography>
+                        <Typography><b>Name or email: </b></Typography>
                         <Autocomplete
                             sx={{ width: "150px" }}
                             {...defaultProps}
@@ -69,7 +72,6 @@ export default function AddFriendDialog({ open, handleClose, setAlert }) {
                                 return (<TextField {...params} variant="standard" />)
                             }}
                         />
-
                     </Box>
                 </DialogContent>
                 <DialogActions>
