@@ -13,7 +13,7 @@ const SplitByPercent = () => {
         const totalChecked = expense.members.filter(m => { return m.checked }).length;
         const shareMembers = expense.members.map(member => {
             if (member.checked) {
-                return { ...member, share: 100 / totalChecked }
+                return { ...member, share: parseFloat((100 / totalChecked).toFixed(2)) }
             } else {
                 return { ...member }
             }

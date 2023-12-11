@@ -9,7 +9,6 @@ import { useSession } from "next-auth/react";
 import { addFriend, getFriends, getSearchResults } from "@/app/services/FriendsService";
 import { FriendsContext } from "@/app/lib/utility/context";
 
-
 export default function AddFriendDialog({ open, handleClose, setAlert }) {
 
 
@@ -27,7 +26,6 @@ export default function AddFriendDialog({ open, handleClose, setAlert }) {
 
     const getDropDownvalues = async (e) => {
         const searchKey = e.target.value
-        console.log(searchKey)
         setResults([]);
         if (searchKey.length > 0) {
             const searchResult = await getSearchResults(e.target.value, session["id_token"])
