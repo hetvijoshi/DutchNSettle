@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p 8080",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy": "gcloud app deploy"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
